@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#1a1208">
+<title>Español — Woordenschat oefenen</title>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,300;0,400;0,700;1,300;1,400&family=Nunito:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #f5f0e8;
+    --ink: #1a1208;
+    --accent: #c8391a;
+    --gold: #d4a017;
+    --muted: #8a7a62;
+    --card: #fffdf7;
+    --border: #d4c9b0;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--ink);
+    font-family: 'Nunito', sans-serif;
+    min-height: 100vh;
+  }
+
+  /* ── HERO ── */
+  .hero {
+    background: var(--ink);
+    color: var(--bg);
+    padding: 64px 32px 56px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  /* Decorative background pattern */
+  .hero::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image:
+      repeating-linear-gradient(
+        0deg,
+        transparent,
+        transparent 39px,
+        rgba(255,255,255,0.03) 39px,
+        rgba(255,255,255,0.03) 40px
+      ),
+      repeating-linear-gradient(
+        90deg,
+        transparent,
+        transparent 39px,
+        rgba(255,255,255,0.03) 39px,
+        rgba(255,255,255,0.03) 40px
+      );
+    pointer-events: none;
+  }
+
+  .hero-inner {
+    max-width: 720px;
+    margin: 0 auto;
+    position: relative;
+  }
+
+  .hero-eyebrow {
+    font-size: 0.72rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .hero-eyebrow::before {
+    content: '';
+    display: block;
+    width: 32px;
+    height: 1px;
+    background: var(--gold);
+  }
+
+  .hero h1 {
+    font-family: 'Fraunces', serif;
+    font-weight: 700;
+    font-size: clamp(2.4rem, 6vw, 3.8rem);
+    line-height: 1.05;
+    letter-spacing: -0.03em;
+    margin-bottom: 16px;
+  }
+
+  .hero h1 em {
+    font-style: italic;
+    font-weight: 300;
+    color: var(--gold);
+  }
+
+  .hero-sub {
+    font-size: 1rem;
+    color: #aaa;
+    line-height: 1.7;
+    max-width: 480px;
+  }
+
+  /* ── MAIN CONTENT ── */
+  .content {
+    max-width: 720px;
+    margin: 0 auto;
+    padding: 48px 24px 80px;
+  }
+
+  .section-label {
+    font-size: 0.68rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .section-label::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--border);
+  }
+
+  /* ── TOOL CARDS ── */
+  .tools-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-bottom: 56px;
+  }
+
+  .tool-card {
+    display: flex;
+    align-items: center;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 20px 24px;
+    text-decoration: none;
+    color: var(--ink);
+    box-shadow: 2px 2px 0 var(--border);
+    transition: transform 0.15s, box-shadow 0.15s, border-color 0.15s;
+    gap: 20px;
+  }
+  .tool-card:hover {
+    transform: translate(-2px, -2px);
+    box-shadow: 4px 4px 0 var(--border);
+    border-color: var(--ink);
+  }
+
+  .tool-card-icon {
+    font-size: 1.6rem;
+    flex-shrink: 0;
+    width: 48px;
+    height: 48px;
+    background: var(--bg);
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid var(--border);
+  }
+
+  .tool-card-body {
+    flex: 1;
+  }
+
+  .tool-card-title {
+    font-family: 'Fraunces', serif;
+    font-weight: 400;
+    font-size: 1.15rem;
+    letter-spacing: -0.01em;
+    margin-bottom: 3px;
+  }
+
+  .tool-card-meta {
+    font-size: 0.75rem;
+    color: var(--muted);
+    letter-spacing: 0.03em;
+  }
+
+  .tool-card-meta span {
+    display: inline-block;
+    margin-right: 12px;
+  }
+
+  .tool-card-arrow {
+    font-size: 1.1rem;
+    color: var(--muted);
+    flex-shrink: 0;
+    transition: transform 0.15s, color 0.15s;
+  }
+  .tool-card:hover .tool-card-arrow {
+    transform: translateX(3px);
+    color: var(--accent);
+  }
+
+  /* Coming soon card */
+  .tool-card.soon {
+    opacity: 0.5;
+    pointer-events: none;
+    cursor: default;
+  }
+  .tool-card.soon:hover {
+    transform: none;
+    box-shadow: 2px 2px 0 var(--border);
+    border-color: var(--border);
+  }
+  .badge-soon {
+    font-size: 0.62rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    background: var(--border);
+    color: var(--muted);
+    padding: 3px 8px;
+    border-radius: 20px;
+    flex-shrink: 0;
+  }
+
+  /* ── HOW TO USE ── */
+  .modes-row {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+    gap: 10px;
+    margin-bottom: 48px;
+  }
+
+  .mode-chip {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 14px 12px;
+    text-align: center;
+  }
+  .mode-chip-icon { font-size: 1.3rem; margin-bottom: 6px; }
+  .mode-chip-name {
+    font-size: 0.72rem;
+    letter-spacing: 0.05em;
+    color: var(--ink);
+    font-weight: 600;
+  }
+  .mode-chip-desc {
+    font-size: 0.65rem;
+    color: var(--muted);
+    margin-top: 2px;
+    line-height: 1.4;
+  }
+
+  /* ── FOOTER ── */
+  footer {
+    border-top: 1px solid var(--border);
+    padding: 24px;
+    text-align: center;
+    font-size: 0.72rem;
+    color: var(--muted);
+    letter-spacing: 0.04em;
+  }
+
+  /* ── ANIMATIONS ── */
+  .hero-inner, .tool-card, .modes-row {
+    animation: fadeUp 0.5s ease both;
+  }
+  .tool-card:nth-child(1) { animation-delay: 0.05s; }
+  .tool-card:nth-child(2) { animation-delay: 0.10s; }
+  .tool-card:nth-child(3) { animation-delay: 0.15s; }
+  .tool-card:nth-child(4) { animation-delay: 0.20s; }
+  .tool-card:nth-child(5) { animation-delay: 0.25s; }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(16px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  @media (max-width: 480px) {
+    .hero { padding: 48px 20px 40px; }
+    .content { padding: 32px 16px 64px; }
+    .tool-card { padding: 16px; }
+    .modes-row { grid-template-columns: repeat(3, 1fr); }
+  }
+</style>
+</head>
+<body>
+
+<div class="hero">
+  <div class="hero-inner">
+    <div class="hero-eyebrow">Woordenschat oefenen</div>
+    <h1>Aprende<br><em>español</em></h1>
+    <p class="hero-sub">Interactieve oefentools per thema. Kies een onderwerp en oefen in vijf verschillende werkvormen, in beide richtingen.</p>
+  </div>
+</div>
+
+<div class="content">
+
+  <div class="section-label">Beschikbare thema's</div>
+
+  <div class="tools-grid">
+
+    <a class="tool-card" href="vliegtuig-vertraging/">
+      <div class="tool-card-icon">✈️</div>
+      <div class="tool-card-body">
+        <div class="tool-card-title">Vliegtuig vertraging</div>
+        <div class="tool-card-meta">
+          <span>15 woorden</span>
+          <span>A2</span>
+        </div>
+      </div>
+      <div class="tool-card-arrow">→</div>
+    </a>
+
+  </div>
+
+</div>
+
+</body>
+</html>
