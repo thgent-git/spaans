@@ -1,0 +1,875 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#1a1208">
+<title>Zoekplaatje — Pinbord</title>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,300;0,700;1,300&family=Nunito:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #f5f0e8;
+    --ink: #1a1208;
+    --accent: #c8391a;
+    --gold: #d4a017;
+    --muted: #8a7a62;
+    --card: #fffdf7;
+    --border: #d4c9b0;
+    --header-h: 54px;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+  html, body { height: 100%; overflow: hidden; }
+
+  body {
+    background: var(--bg);
+    color: var(--ink);
+    font-family: 'Nunito', sans-serif;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* ── HEADER ── */
+  header {
+    background: var(--ink);
+    color: var(--bg);
+    padding: 0 14px;
+    height: var(--header-h);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-shrink: 0;
+    z-index: 100;
+  }
+  header h1 {
+    font-family: 'Fraunces', serif;
+    font-weight: 700;
+    font-size: 1.15rem;
+    letter-spacing: -0.02em;
+    flex-shrink: 0;
+  }
+  .header-room {
+    font-size: 0.65rem;
+    color: var(--gold);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    flex: 1;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .header-name {
+    font-size: 0.72rem;
+    color: #aaa;
+    flex-shrink: 0;
+    white-space: nowrap;
+  }
+
+  /* ── TOOLBAR (teacher only) ── */
+  .toolbar {
+    background: var(--card);
+    border-bottom: 1px solid var(--border);
+    padding: 8px 14px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-shrink: 0;
+    flex-wrap: wrap;
+  }
+  .toolbar-label {
+    font-size: 0.65rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--muted);
+    flex-shrink: 0;
+  }
+  .tb-btn {
+    padding: 8px 14px;
+    border-radius: 8px;
+    border: 1.5px solid var(--border);
+    background: none;
+    font-family: 'Nunito', sans-serif;
+    font-size: 0.78rem;
+    font-weight: 600;
+    cursor: pointer;
+    color: var(--ink);
+    transition: all 0.15s;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    min-height: 36px;
+    touch-action: manipulation;
+  }
+  .tb-btn:hover { background: var(--ink); color: var(--bg); border-color: var(--ink); }
+  .tb-btn.active { background: var(--gold); border-color: var(--gold); color: var(--ink); }
+  .tb-btn.danger:hover { background: var(--accent); border-color: var(--accent); color: white; }
+  .tb-sep { width: 1px; height: 24px; background: var(--border); flex-shrink: 0; }
+  .tb-spacer { flex: 1; }
+  .tb-count {
+    font-size: 0.7rem;
+    color: var(--muted);
+    flex-shrink: 0;
+  }
+
+  /* ── IMAGE AREA ── */
+  .image-wrap {
+    flex: 1;
+    position: relative;
+    overflow: hidden;
+    background: #222;
+    cursor: crosshair;
+    touch-action: none;
+  }
+  .image-wrap.pins-hidden { cursor: default; }
+
+  #the-image {
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    object-fit: contain;
+    object-position: center;
+    display: block;
+    user-select: none;
+    -webkit-user-drag: none;
+    pointer-events: none;
+  }
+
+  /* No image placeholder */
+  .no-image {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    color: #888;
+    pointer-events: none;
+  }
+  .no-image-icon { font-size: 3rem; opacity: 0.4; }
+  .no-image p { font-size: 0.82rem; opacity: 0.6; text-align: center; padding: 0 20px; }
+
+  /* ── PINS ── */
+  .pin-layer {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+  }
+  .pin-layer.visible { pointer-events: none; }
+
+  .pin {
+    position: absolute;
+    transform: translate(-50%, -100%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    pointer-events: none;
+    transition: opacity 0.3s;
+  }
+  .pin.hidden-pin { opacity: 0; pointer-events: none; }
+
+  .pin-bubble {
+    background: currentColor;
+    color: white;
+    padding: 3px 7px;
+    border-radius: 10px;
+    font-family: 'Nunito', sans-serif;
+    font-size: 11px;
+    font-weight: 700;
+    white-space: nowrap;
+    letter-spacing: 0.02em;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+    position: relative;
+    line-height: 1.4;
+  }
+  .pin-bubble span { color: white; mix-blend-mode: normal; }
+  .pin-bubble::after {
+    content: '';
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    border: 5px solid transparent;
+    border-top-color: currentColor;
+  }
+  .pin-dot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    background: currentColor;
+    margin-top: 0px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.4);
+  }
+
+  /* Own pin pulse animation */
+  .pin.own-pin .pin-dot {
+    animation: pulseDot 1.5s ease-in-out 2;
+  }
+  @keyframes pulseDot {
+    0%, 100% { transform: scale(1); box-shadow: 0 1px 3px rgba(0,0,0,0.4); }
+    50% { transform: scale(1.8); box-shadow: 0 0 0 4px rgba(255,255,255,0.3); }
+  }
+
+  /* ── SETUP MODAL ── */
+  .modal-bg {
+    position: fixed;
+    inset: 0;
+    background: rgba(26,18,8,0.7);
+    z-index: 500;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+  }
+  .modal {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 28px 24px;
+    width: 100%;
+    max-width: 380px;
+    box-shadow: 5px 5px 0 var(--border);
+  }
+  .modal h2 {
+    font-family: 'Fraunces', serif;
+    font-size: 1.5rem;
+    font-weight: 300;
+    margin-bottom: 6px;
+  }
+  .modal p {
+    font-size: 0.78rem;
+    color: var(--muted);
+    margin-bottom: 20px;
+    line-height: 1.6;
+  }
+  .field-label {
+    font-size: 0.65rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 6px;
+    display: block;
+  }
+  .field-input {
+    width: 100%;
+    padding: 12px 14px;
+    background: var(--bg);
+    border: 1.5px solid var(--border);
+    border-radius: 8px;
+    font-family: 'Nunito', sans-serif;
+    font-size: 1rem;
+    color: var(--ink);
+    outline: none;
+    margin-bottom: 16px;
+    transition: border-color 0.2s;
+    /* prevent iOS zoom */
+    font-size: max(16px, 1rem);
+  }
+  .field-input:focus { border-color: var(--ink); }
+
+  .role-toggle {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 20px;
+  }
+  .role-btn {
+    flex: 1;
+    padding: 12px;
+    border: 1.5px solid var(--border);
+    border-radius: 8px;
+    background: none;
+    font-family: 'Nunito', sans-serif;
+    font-size: 0.82rem;
+    font-weight: 600;
+    cursor: pointer;
+    color: var(--muted);
+    transition: all 0.15s;
+    text-align: center;
+  }
+  .role-btn.active {
+    border-color: var(--ink);
+    background: var(--ink);
+    color: var(--bg);
+  }
+
+  .modal-submit {
+    width: 100%;
+    padding: 14px;
+    background: var(--ink);
+    color: var(--bg);
+    border: none;
+    border-radius: 10px;
+    font-family: 'Nunito', sans-serif;
+    font-size: 1rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: opacity 0.15s;
+  }
+  .modal-submit:hover { opacity: 0.85; }
+
+  /* Color swatches */
+  .color-row {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+  }
+  .color-swatch {
+    width: 32px; height: 32px;
+    border-radius: 50%;
+    border: 3px solid transparent;
+    cursor: pointer;
+    transition: transform 0.15s, border-color 0.15s;
+    touch-action: manipulation;
+  }
+  .color-swatch:hover { transform: scale(1.15); }
+  .color-swatch.selected { border-color: var(--ink); transform: scale(1.15); }
+
+  /* ── ROOM CODE DISPLAY ── */
+  .room-display {
+    text-align: center;
+    padding: 10px 14px;
+    background: var(--bg);
+    border: 1.5px dashed var(--border);
+    border-radius: 8px;
+    margin-bottom: 16px;
+  }
+  .room-code {
+    font-family: 'Fraunces', serif;
+    font-size: 2rem;
+    font-weight: 700;
+    letter-spacing: 0.15em;
+    color: var(--ink);
+  }
+  .room-display small {
+    display: block;
+    font-size: 0.65rem;
+    color: var(--muted);
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    margin-top: 2px;
+  }
+
+  /* ── STUDENT STATUS BAR ── */
+  .student-bar {
+    background: var(--card);
+    border-bottom: 1px solid var(--border);
+    padding: 8px 14px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-shrink: 0;
+    flex-wrap: wrap;
+  }
+  .student-info {
+    font-size: 0.72rem;
+    color: var(--muted);
+    flex: 1;
+  }
+  .student-info strong { color: var(--ink); }
+  .my-pin-dot {
+    display: inline-block;
+    width: 10px; height: 10px;
+    border-radius: 50%;
+    margin-right: 4px;
+    vertical-align: middle;
+  }
+  .student-status {
+    font-size: 0.72rem;
+    padding: 4px 10px;
+    border-radius: 6px;
+    font-weight: 600;
+  }
+  .student-status.placed { background: #e8f5e8; color: #2d6a2d; }
+  .student-status.waiting { background: #fdf8ec; color: var(--gold); }
+
+  /* ── TOAST ── */
+  .toast {
+    position: fixed;
+    bottom: 24px;
+    left: 50%;
+    transform: translateX(-50%) translateY(80px);
+    background: var(--ink);
+    color: var(--bg);
+    padding: 10px 20px;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+    opacity: 0;
+    transition: transform 0.3s, opacity 0.3s;
+    z-index: 999;
+    white-space: nowrap;
+    pointer-events: none;
+  }
+  .toast.show {
+    transform: translateX(-50%) translateY(0);
+    opacity: 1;
+  }
+
+  /* ── UPLOAD OVERLAY (teacher) ── */
+  .upload-overlay {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10;
+    background: rgba(26,18,8,0.55);
+    cursor: pointer;
+    transition: opacity 0.2s;
+  }
+  .upload-overlay:hover { background: rgba(26,18,8,0.65); }
+  .upload-box {
+    background: var(--card);
+    border: 2px dashed var(--border);
+    border-radius: 14px;
+    padding: 32px 40px;
+    text-align: center;
+    pointer-events: none;
+  }
+  .upload-box p { font-size: 0.82rem; color: var(--muted); margin-top: 8px; }
+  .upload-icon { font-size: 2.5rem; }
+  #file-input { display: none; }
+
+  @media (max-width: 480px) {
+    .tb-btn { padding: 8px 10px; font-size: 0.72rem; }
+    .toolbar { gap: 6px; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Zoekplaatje</h1>
+  <span class="header-room" id="header-room"></span>
+  <span class="header-name" id="header-name"></span>
+</header>
+
+<!-- Teacher toolbar -->
+<div class="toolbar" id="teacher-toolbar" style="display:none;">
+  <span class="toolbar-label">Docent</span>
+  <div class="tb-sep"></div>
+  <button class="tb-btn" id="btn-upload" onclick="document.getElementById('file-input').click()">
+    &#128247; Afbeelding
+  </button>
+  <input type="file" id="file-input" accept="image/*" onchange="handleImageUpload(event)">
+  <div class="tb-sep"></div>
+  <button class="tb-btn" id="btn-toggle" onclick="togglePins()">
+    &#128065; Pins verbergen
+  </button>
+  <button class="tb-btn danger" id="btn-clear" onclick="confirmClear()">
+    &#128465; Wis alle pins
+  </button>
+  <div class="tb-spacer"></div>
+  <span class="tb-count" id="pin-count">0 pins</span>
+</div>
+
+<!-- Student status bar -->
+<div class="student-bar" id="student-bar" style="display:none;">
+  <div class="student-info" id="student-info"></div>
+  <span class="student-status waiting" id="student-status">Nog geen pin</span>
+</div>
+
+<!-- Main image area -->
+<div class="image-wrap" id="image-wrap">
+  <img id="the-image" src="" alt="" style="display:none;">
+
+  <div class="no-image" id="no-image-msg">
+    <div class="no-image-icon">&#128247;</div>
+    <p id="no-image-text">Wacht op de docent om een afbeelding te laden...</p>
+  </div>
+
+  <!-- Teacher: upload overlay (shown when no image) -->
+  <div class="upload-overlay" id="upload-overlay" style="display:none;" onclick="document.getElementById('file-input').click()">
+    <div class="upload-box">
+      <div class="upload-icon">&#128247;</div>
+      <p>Klik om een afbeelding te uploaden</p>
+    </div>
+  </div>
+
+  <!-- Pins layer -->
+  <div class="pin-layer" id="pin-layer"></div>
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast"></div>
+
+<!-- Setup modal -->
+<div class="modal-bg" id="setup-modal">
+  <div class="modal">
+    <h2>Welkom</h2>
+    <p>Voer je naam in en kies een kleur voor je pin. De docent geeft je de kamercode.</p>
+
+    <label class="field-label">Jouw naam</label>
+    <input class="field-input" type="text" id="input-name" placeholder="bijv. Anna" maxlength="20"
+      onkeydown="if(event.key==='Enter') tryJoin()">
+
+    <label class="field-label">Kamercode (van de docent)</label>
+    <input class="field-input" type="text" id="input-room" placeholder="bijv. AB12"
+      maxlength="6" style="text-transform:uppercase; letter-spacing:0.1em;"
+      onkeydown="if(event.key==='Enter') tryJoin()" oninput="this.value=this.value.toUpperCase()">
+
+    <label class="field-label">Kies een kleur</label>
+    <div class="color-row" id="color-row"></div>
+
+    <div class="role-toggle">
+      <button class="role-btn active" id="role-student" onclick="setRole('student')">&#127891; Cursist</button>
+      <button class="role-btn" id="role-teacher" onclick="setRole('teacher')">&#128203; Docent</button>
+    </div>
+
+    <div id="teacher-setup" style="display:none;">
+      <div class="room-display">
+        <div class="room-code" id="display-room-code">—</div>
+        <small>Deel deze code met je cursisten</small>
+      </div>
+    </div>
+
+    <button class="modal-submit" onclick="tryJoin()">Deelnemen →</button>
+  </div>
+</div>
+
+<script type="module">
+import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js';
+import { getDatabase, ref, set, onValue, remove, update, get }
+  from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js';
+
+// ── FIREBASE CONFIG ──────────────────────────────────────────────
+// VERVANG DIT met jouw eigen Firebase config
+// Zie README onderaan dit bestand voor instructies
+const FIREBASE_CONFIG = {
+  apiKey: "AIzaSyA5XVJayswbyo_HUGk03Gx4LqxYOyUGy3w",
+  authDomain: "zoekplaatjevliegveld.firebaseapp.com",
+  databaseURL: "https://zoekplaatjevliegveld-default-rtdb.europe-west1.firebasedatabase.app",
+  projectId: "zoekplaatjevliegveld",
+  storageBucket: "zoekplaatjevliegveld.firebasestorage.app",
+  messagingSenderId: "709141638173",
+  appId: "1:709141638173:web:bf27cf50f657cc55fe6af4"
+};
+// ────────────────────────────────────────────────────────────────
+
+const PIN_COLORS = [
+  '#c8391a','#1565c0','#2e7d32','#d4a017',
+  '#6a1b9a','#00838f','#ad1457','#e65100',
+  '#37474f','#558b2f'
+];
+
+const app  = initializeApp(FIREBASE_CONFIG);
+const db   = getDatabase(app);
+
+let myName   = '';
+let myColor  = PIN_COLORS[0];
+let myRole   = 'student';
+let roomCode = '';
+let myPinId  = null;
+let pinsVisible = true;
+let hasImage = false;
+let selectedColor = 0;
+
+// ── COLOR PICKER ─────────────────────────────────────────────────
+const colorRow = document.getElementById('color-row');
+PIN_COLORS.forEach((c, i) => {
+  const sw = document.createElement('button');
+  sw.className = 'color-swatch' + (i === 0 ? ' selected' : '');
+  sw.style.background = c;
+  sw.onclick = () => {
+    document.querySelectorAll('.color-swatch').forEach(s => s.classList.remove('selected'));
+    sw.classList.add('selected');
+    selectedColor = i;
+    myColor = c;
+  };
+  colorRow.appendChild(sw);
+});
+
+// ── ROLE TOGGLE ───────────────────────────────────────────────────
+window.setRole = function(role) {
+  myRole = role;
+  document.getElementById('role-student').classList.toggle('active', role === 'student');
+  document.getElementById('role-teacher').classList.toggle('active', role === 'teacher');
+  document.getElementById('teacher-setup').style.display = role === 'teacher' ? 'block' : 'none';
+  document.getElementById('input-room').style.display = role === 'teacher' ? 'none' : 'block';
+  document.querySelector('[for="input-room"], .field-label:nth-of-type(2)');
+
+  if (role === 'teacher') {
+    // Generate a room code
+    const code = Math.random().toString(36).substring(2,4).toUpperCase()
+                + Math.floor(10+Math.random()*90);
+    document.getElementById('input-room').value = code;
+    document.getElementById('display-room-code').textContent = code;
+  }
+};
+
+// Show/hide room input label based on role
+const roomLabel = document.querySelectorAll('.field-label')[1];
+document.getElementById('role-student').addEventListener('click', () => {
+  roomLabel.style.display = 'block';
+  document.getElementById('input-room').style.display = 'block';
+});
+document.getElementById('role-teacher').addEventListener('click', () => {
+  roomLabel.style.display = 'none';
+  document.getElementById('input-room').style.display = 'none';
+});
+
+// ── JOIN ─────────────────────────────────────────────────────────
+window.tryJoin = function() {
+  const nameVal = document.getElementById('input-name').value.trim();
+  const roomVal = document.getElementById('input-room').value.trim().toUpperCase();
+
+  if (!nameVal) { showToast('Voer je naam in'); return; }
+  if (!roomVal) { showToast('Voer een kamercode in'); return; }
+
+  myName   = nameVal;
+  roomCode = roomVal;
+  myColor  = PIN_COLORS[selectedColor];
+
+  document.getElementById('setup-modal').style.display = 'none';
+  document.getElementById('header-room').textContent = 'Kamer: ' + roomCode;
+  document.getElementById('header-name').textContent = myName;
+
+  if (myRole === 'teacher') {
+    enterTeacher();
+  } else {
+    enterStudent();
+  }
+};
+
+// ── TEACHER ──────────────────────────────────────────────────────
+function enterTeacher() {
+  document.getElementById('teacher-toolbar').style.display = 'flex';
+  document.getElementById('upload-overlay').style.display = 'flex';
+
+  // Watch pins
+  onValue(ref(db, `rooms/${roomCode}/pins`), snap => {
+    renderAllPins(snap.val() || {});
+  });
+
+  // Watch image
+  onValue(ref(db, `rooms/${roomCode}/image`), snap => {
+    const url = snap.val();
+    if (url) {
+      setImage(url);
+      document.getElementById('upload-overlay').style.display = 'none';
+    }
+  });
+
+  // Watch visibility state
+  onValue(ref(db, `rooms/${roomCode}/pinsVisible`), snap => {
+    const v = snap.val();
+    pinsVisible = (v === null) ? true : v;
+    applyPinVisibility();
+    const btn = document.getElementById('btn-toggle');
+    btn.textContent = pinsVisible ? '🫣 Pins verbergen' : '👁 Pins tonen';
+    btn.classList.toggle('active', !pinsVisible);
+  });
+}
+
+// ── STUDENT ───────────────────────────────────────────────────────
+function enterStudent() {
+  document.getElementById('student-bar').style.display = 'flex';
+  updateStudentInfo();
+
+  // Watch image
+  onValue(ref(db, `rooms/${roomCode}/image`), snap => {
+    const url = snap.val();
+    if (url) {
+      setImage(url);
+    } else {
+      document.getElementById('no-image-msg').style.display = 'flex';
+      document.getElementById('the-image').style.display = 'none';
+    }
+  });
+
+  // Watch pins (only to show own pin and count)
+  onValue(ref(db, `rooms/${roomCode}/pins`), snap => {
+    renderAllPins(snap.val() || {});
+    const myPin = (snap.val() || {})[myPinId];
+    if (myPinId && myPin) {
+      document.getElementById('student-status').textContent = '✓ Pin geplaatst';
+      document.getElementById('student-status').className = 'student-status placed';
+    }
+  });
+
+  // Watch visibility
+  onValue(ref(db, `rooms/${roomCode}/pinsVisible`), snap => {
+    const v = snap.val();
+    pinsVisible = (v === null) ? true : v;
+    applyPinVisibility();
+  });
+}
+
+function updateStudentInfo() {
+  document.getElementById('student-info').innerHTML =
+    `<span class="my-pin-dot" style="background:${myColor}"></span>
+     <strong>${myName}</strong> — klik op de afbeelding om je pin te plaatsen`;
+}
+
+// ── IMAGE ─────────────────────────────────────────────────────────
+window.handleImageUpload = function(e) {
+  const file = e.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = ev => {
+    const dataUrl = ev.target.result;
+    // Store in Firebase (base64 — fine for classroom use, images < ~1MB)
+    set(ref(db, `rooms/${roomCode}/image`), dataUrl);
+    showToast('Afbeelding geladen');
+  };
+  reader.readAsDataURL(file);
+};
+
+function setImage(url) {
+  const img = document.getElementById('the-image');
+  img.src = url;
+  img.style.display = 'block';
+  document.getElementById('no-image-msg').style.display = 'none';
+  hasImage = true;
+}
+
+// ── CLICKING TO PLACE PIN ─────────────────────────────────────────
+document.getElementById('image-wrap').addEventListener('click', e => {
+  if (myRole === 'teacher') return;
+  if (!hasImage) return;
+
+  const wrap = document.getElementById('image-wrap');
+  const rect = wrap.getBoundingClientRect();
+  const pct_x = ((e.clientX - rect.left) / rect.width)  * 100;
+  const pct_y = ((e.clientY - rect.top)  / rect.height) * 100;
+
+  placePin(pct_x, pct_y);
+});
+
+// Touch support
+document.getElementById('image-wrap').addEventListener('touchend', e => {
+  if (myRole === 'teacher') return;
+  if (!hasImage) return;
+  e.preventDefault();
+  const touch = e.changedTouches[0];
+  const wrap = document.getElementById('image-wrap');
+  const rect = wrap.getBoundingClientRect();
+  const pct_x = ((touch.clientX - rect.left) / rect.width)  * 100;
+  const pct_y = ((touch.clientY - rect.top)  / rect.height) * 100;
+  placePin(pct_x, pct_y);
+}, { passive: false });
+
+function placePin(pct_x, pct_y) {
+  // Remove own previous pin
+  if (myPinId) {
+    remove(ref(db, `rooms/${roomCode}/pins/${myPinId}`));
+  }
+  myPinId = myName.replace(/\s+/g, '_') + '_' + Date.now();
+
+  set(ref(db, `rooms/${roomCode}/pins/${myPinId}`), {
+    name:  myName,
+    color: myColor,
+    x:     Math.round(pct_x * 100) / 100,
+    y:     Math.round(pct_y * 100) / 100,
+    ts:    Date.now()
+  });
+
+  document.getElementById('student-status').textContent = '✓ Pin geplaatst';
+  document.getElementById('student-status').className = 'student-status placed';
+}
+
+// ── RENDER PINS ───────────────────────────────────────────────────
+function renderAllPins(pinsObj) {
+  const layer = document.getElementById('pin-layer');
+  layer.innerHTML = '';
+
+  const entries = Object.entries(pinsObj);
+  document.getElementById('pin-count') &&
+    (document.getElementById('pin-count').textContent =
+      entries.length + (entries.length === 1 ? ' pin' : ' pins'));
+
+  entries.forEach(([id, pin]) => {
+    const el = document.createElement('div');
+    el.className = 'pin' + (pinsVisible ? '' : ' hidden-pin')
+                 + (id === myPinId ? ' own-pin' : '');
+    el.style.left  = pin.x + '%';
+    el.style.top   = pin.y + '%';
+    el.style.color = pin.color;
+
+    el.innerHTML = `
+      <div class="pin-bubble"><span>${pin.name}</span></div>
+      <div class="pin-dot"></div>
+    `;
+    layer.appendChild(el);
+  });
+}
+
+function applyPinVisibility() {
+  document.querySelectorAll('.pin').forEach(el => {
+    el.classList.toggle('hidden-pin', !pinsVisible);
+  });
+}
+
+// ── TEACHER CONTROLS ──────────────────────────────────────────────
+window.togglePins = function() {
+  const newVal = !pinsVisible;
+  set(ref(db, `rooms/${roomCode}/pinsVisible`), newVal);
+};
+
+window.confirmClear = function() {
+  if (confirm('Alle pins verwijderen?')) {
+    remove(ref(db, `rooms/${roomCode}/pins`));
+    myPinId = null;
+    showToast('Alle pins verwijderd');
+  }
+};
+
+// ── TOAST ─────────────────────────────────────────────────────────
+window.showToast = function(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2200);
+};
+</script>
+
+<!--
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  INSTALLATIE — Lees dit eenmalig
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+STAP 1 — Firebase project aanmaken (gratis, ~5 min)
+  1. Ga naar https://console.firebase.google.com
+  2. Klik "Add project" → geef het een naam (bijv. zoekplaatje)
+  3. Google Analytics: niet nodig, zet uit
+  4. Klik "Create project"
+
+STAP 2 — Realtime Database activeren
+  1. Links in het menu: Build → Realtime Database
+  2. Klik "Create Database"
+  3. Kies regio: europe-west1 (België)
+  4. Start in "test mode" (regels open, goed voor klasgebruik)
+  5. Klik "Enable"
+
+STAP 3 — App registreren & config kopiëren
+  1. Ga naar Project Overview (tandwiel links boven)
+  2. Klik het </> (web) icoontje
+  3. Geef de app een naam, klik "Register app"
+  4. Kopieer het firebaseConfig object
+  5. Plak het in dit bestand bij FIREBASE_CONFIG (bovenaan de <script>)
+
+STAP 4 — Op GitHub Pages zetten
+  1. Zet dit bestand in je spaans/ repository
+  2. GitHub Pages serveert het automatisch
+
+GEBRUIK IN DE LES
+  • Docent opent de tool, kiest rol "Docent" → krijgt kamercode
+  • Docent deelt de kamercode (of QR van de URL) met cursisten
+  • Cursisten openen dezelfde URL, kiezen rol "Cursist", voeren code in
+  • Docent uploadt afbeelding → verschijnt bij iedereen
+  • Cursisten klikken → pin verschijnt (verborgen voor anderen)
+  • Docent klikt "Pins tonen" → alle pins zichtbaar tegelijk
+  • Docent klikt "Wis alle pins" → volgende ronde
+
+NOTITIES
+  • Afbeeldingen worden als base64 opgeslagen in Firebase.
+    Houd ze onder ~800KB voor vlotte werking (bijv. JPEG, niet RAW).
+  • Firebase gratis plan (Spark): 1 GB opslag, 10 GB/maand download.
+    Voor klasgebruik ruim voldoende.
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+-->
+</body>
+</html>
