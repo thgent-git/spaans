@@ -408,31 +408,6 @@
     opacity: 1;
   }
 
-  /* ── UPLOAD OVERLAY (teacher) ── */
-  .upload-overlay {
-    position: absolute;
-    inset: 0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    z-index: 10;
-    background: rgba(26,18,8,0.55);
-    cursor: pointer;
-    transition: opacity 0.2s;
-  }
-  .upload-overlay:hover { background: rgba(26,18,8,0.65); }
-  .upload-box {
-    background: var(--card);
-    border: 2px dashed var(--border);
-    border-radius: 14px;
-    padding: 32px 40px;
-    text-align: center;
-    pointer-events: none;
-  }
-  .upload-box p { font-size: 0.82rem; color: var(--muted); margin-top: 8px; }
-  .upload-icon { font-size: 2.5rem; }
-  #file-input { display: none; }
-
   @media (max-width: 480px) {
     .tb-btn { padding: 8px 10px; font-size: 0.72rem; }
     .toolbar { gap: 6px; }
@@ -450,11 +425,6 @@
 <!-- Teacher toolbar -->
 <div class="toolbar" id="teacher-toolbar" style="display:none;">
   <span class="toolbar-label">Docent</span>
-  <div class="tb-sep"></div>
-  <button class="tb-btn" id="btn-upload" onclick="document.getElementById('file-input').click()">
-    &#128247; Afbeelding
-  </button>
-  <input type="file" id="file-input" accept="image/*" onchange="handleImageUpload(event)">
   <div class="tb-sep"></div>
   <button class="tb-btn" id="btn-toggle" onclick="togglePins()">
     &#128065; Pins verbergen
@@ -479,14 +449,6 @@
   <div class="no-image" id="no-image-msg">
     <div class="no-image-icon">&#128247;</div>
     <p id="no-image-text">Wacht op de docent om een afbeelding te laden...</p>
-  </div>
-
-  <!-- Teacher: upload overlay (shown when no image) -->
-  <div class="upload-overlay" id="upload-overlay" style="display:none;" onclick="document.getElementById('file-input').click()">
-    <div class="upload-box">
-      <div class="upload-icon">&#128247;</div>
-      <p>Klik om een afbeelding te uploaden</p>
-    </div>
   </div>
 
   <!-- Pins layer -->
@@ -637,20 +599,12 @@ window.tryJoin = function() {
 // ── TEACHER ──────────────────────────────────────────────────────
 function enterTeacher() {
   document.getElementById('teacher-toolbar').style.display = 'flex';
-  document.getElementById('upload-overlay').style.display = 'flex';
+
+  loadStaticImage();
 
   // Watch pins
   onValue(ref(db, `rooms/${roomCode}/pins`), snap => {
     renderAllPins(snap.val() || {});
-  });
-
-  // Watch image
-  onValue(ref(db, `rooms/${roomCode}/image`), snap => {
-    const url = snap.val();
-    if (url) {
-      setImage(url);
-      document.getElementById('upload-overlay').style.display = 'none';
-    }
   });
 
   // Watch visibility state
@@ -669,18 +623,9 @@ function enterStudent() {
   document.getElementById('student-bar').style.display = 'flex';
   updateStudentInfo();
 
-  // Watch image
-  onValue(ref(db, `rooms/${roomCode}/image`), snap => {
-    const url = snap.val();
-    if (url) {
-      setImage(url);
-    } else {
-      document.getElementById('no-image-msg').style.display = 'flex';
-      document.getElementById('the-image').style.display = 'none';
-    }
-  });
+  loadStaticImage();
 
-  // Watch pins (only to show own pin and count)
+  // Watch pins
   onValue(ref(db, `rooms/${roomCode}/pins`), snap => {
     renderAllPins(snap.val() || {});
     const myPin = (snap.val() || {})[myPinId];
@@ -705,25 +650,22 @@ function updateStudentInfo() {
 }
 
 // ── IMAGE ─────────────────────────────────────────────────────────
-window.handleImageUpload = function(e) {
-  const file = e.target.files[0];
-  if (!file) return;
-  const reader = new FileReader();
-  reader.onload = ev => {
-    const dataUrl = ev.target.result;
-    // Store in Firebase (base64 — fine for classroom use, images < ~1MB)
-    set(ref(db, `rooms/${roomCode}/image`), dataUrl);
-    showToast('Afbeelding geladen');
-  };
-  reader.readAsDataURL(file);
-};
+// Afbeelding staat als 'afbeelding.png' naast dit HTML-bestand in de repo.
+// Vervang de bestandsnaam hieronder als je een andere naam gebruikt.
+const IMAGE_FILE = 'afbeelding.png';
 
-function setImage(url) {
+function loadStaticImage() {
   const img = document.getElementById('the-image');
-  img.src = url;
-  img.style.display = 'block';
-  document.getElementById('no-image-msg').style.display = 'none';
-  hasImage = true;
+  img.onload = () => {
+    img.style.display = 'block';
+    document.getElementById('no-image-msg').style.display = 'none';
+    hasImage = true;
+  };
+  img.onerror = () => {
+    document.getElementById('no-image-text').textContent =
+      `Afbeelding '${IMAGE_FILE}' niet gevonden. Zet het bestand in dezelfde map als index.html.`;
+  };
+  img.src = IMAGE_FILE;
 }
 
 // ── CLICKING TO PLACE PIN ─────────────────────────────────────────
@@ -851,24 +793,23 @@ STAP 3 — App registreren & config kopiëren
   4. Kopieer het firebaseConfig object
   5. Plak het in dit bestand bij FIREBASE_CONFIG (bovenaan de <script>)
 
-STAP 4 — Op GitHub Pages zetten
-  1. Zet dit bestand in je spaans/ repository
-  2. GitHub Pages serveert het automatisch
+STAP 4 — Afbeelding toevoegen
+  Zet je afbeelding als 'afbeelding.jpg' in dezelfde map als index.html.
+  Wil je een andere bestandsnaam? Pas IMAGE_FILE aan in de <script>.
+  Push naar GitHub — klaar.
 
 GEBRUIK IN DE LES
   • Docent opent de tool, kiest rol "Docent" → krijgt kamercode
-  • Docent deelt de kamercode (of QR van de URL) met cursisten
-  • Cursisten openen dezelfde URL, kiezen rol "Cursist", voeren code in
-  • Docent uploadt afbeelding → verschijnt bij iedereen
-  • Cursisten klikken → pin verschijnt (verborgen voor anderen)
+  • Docent deelt de kamercode met cursisten (mondeling of in de chat)
+  • Cursisten openen dezelfde URL, kiezen "Cursist", voeren code in
+  • Cursisten klikken op de afbeelding → pin geplaatst (verborgen)
   • Docent klikt "Pins tonen" → alle pins zichtbaar tegelijk
   • Docent klikt "Wis alle pins" → volgende ronde
 
-NOTITIES
-  • Afbeeldingen worden als base64 opgeslagen in Firebase.
-    Houd ze onder ~800KB voor vlotte werking (bijv. JPEG, niet RAW).
-  • Firebase gratis plan (Spark): 1 GB opslag, 10 GB/maand download.
-    Voor klasgebruik ruim voldoende.
+NIEUWE LES / NIEUW THEMA
+  • Vervang afbeelding.jpg door een nieuwe afbeelding
+  • Push naar GitHub — pins uit vorige les verdwijnen vanzelf
+    als je de Firebase database leegt (of gewoon een nieuwe kamercode gebruikt)
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 -->
 </body>
