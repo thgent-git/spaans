@@ -192,7 +192,7 @@
     left: 50%;
     transform: translateX(-50%);
     border: 5px solid transparent;
-    border-top-color: currentColor;
+    border-top-color: inherit;
   }
   .pin-dot {
     width: 8px; height: 8px;
@@ -650,9 +650,9 @@ function updateStudentInfo() {
 }
 
 // ── IMAGE ─────────────────────────────────────────────────────────
-// Afbeelding staat als 'afbeelding.png' naast dit HTML-bestand in de repo.
+// Afbeelding staat als 'afbeelding.jpg' naast dit HTML-bestand in de repo.
 // Vervang de bestandsnaam hieronder als je een andere naam gebruikt.
-const IMAGE_FILE = 'afbeelding.png';
+const IMAGE_FILE = 'afbeelding.jpg';
 
 function loadStaticImage() {
   const img = document.getElementById('the-image');
@@ -731,9 +731,10 @@ function renderAllPins(pinsObj) {
     el.style.top   = pin.y + '%';
     el.style.color = pin.color;
 
+    const label = pin.name || pin.naam || '?';
     el.innerHTML = `
-      <div class="pin-bubble"><span>${pin.name}</span></div>
-      <div class="pin-dot"></div>
+      <div class="pin-bubble" style="background:${pin.color};color:#fff;">${label}</div>
+      <div class="pin-dot" style="background:${pin.color};"></div>
     `;
     layer.appendChild(el);
   });
