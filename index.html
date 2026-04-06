@@ -4,21 +4,24 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="theme-color" content="#1a1208">
-<title>Español — Woordenschat oefenen</title>
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,300;0,400;0,700;1,300;1,400&family=Nunito:wght@400;500;600&display=swap" rel="stylesheet">
+<title>Español — Oefenmateriaal A2+</title>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,700;1,9..144,300&family=Nunito:wght@400;500;600;700&display=swap" rel="stylesheet">
+
 <style>
   :root {
-    --bg: #f5f0e8;
-    --ink: #1a1208;
-    --accent: #c8391a;
-    --gold: #d4a017;
-    --muted: #8a7a62;
-    --card: #fffdf7;
-    --border: #d4c9b0;
+    --bg:      #f5f0e8;
+    --ink:     #1a1208;
+    --accent:  #c8391a;
+    --gold:    #d4a017;
+    --muted:   #8a7a62;
+    --card:    #fffdf7;
+    --border:  #d4c9b0;
+    --green:   #2d6a2d;
+    --shadow:  rgba(26,18,8,0.10);
   }
 
-  * { box-sizing: border-box; margin: 0; padding: 0; }
-
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+  html { scroll-behavior: smooth; }
   body {
     background: var(--bg);
     color: var(--ink);
@@ -26,309 +29,509 @@
     min-height: 100vh;
   }
 
-  /* ── HERO ── */
+  /* ── HEADER ─────────────────────────────────────── */
+  header {
+    background: var(--ink);
+    color: var(--bg);
+    padding: 0 24px;
+    position: sticky;
+    top: 0;
+    z-index: 200;
+    display: flex;
+    align-items: center;
+    gap: 0;
+    flex-wrap: wrap;
+  }
+
+  .header-brand {
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+    padding: 14px 0;
+    flex: 1;
+    min-width: 180px;
+  }
+  .header-brand h1 {
+    font-family: 'Fraunces', serif;
+    font-size: 1.35rem;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    line-height: 1;
+  }
+  .header-brand .level-badge {
+    font-size: 0.6rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--gold);
+    background: rgba(212,160,23,0.15);
+    border: 1px solid rgba(212,160,23,0.35);
+    border-radius: 3px;
+    padding: 2px 6px;
+    white-space: nowrap;
+  }
+
+  /* ── TAB TOGGLE ──────────────────────────────────── */
+  .tab-toggle {
+    display: flex;
+    gap: 0;
+    padding: 10px 0;
+  }
+  .tab-toggle button {
+    padding: 8px 18px;
+    background: transparent;
+    color: #888;
+    border: 1px solid #333;
+    cursor: pointer;
+    font-family: 'Nunito', sans-serif;
+    font-size: 0.72rem;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    transition: background 0.2s, color 0.2s, border-color 0.2s;
+    min-height: 38px;
+    position: relative;
+  }
+  .tab-toggle button:first-child { border-radius: 6px 0 0 6px; }
+  .tab-toggle button:last-child  { border-radius: 0 6px 6px 0; border-left: none; }
+  .tab-toggle button.active {
+    background: var(--accent);
+    color: white;
+    border-color: var(--accent);
+  }
+  .tab-toggle button:not(.active):hover {
+    color: var(--bg);
+    border-color: #555;
+  }
+  .tab-toggle .teacher-icon {
+    margin-left: 5px;
+    font-size: 0.85em;
+    opacity: 0.8;
+  }
+
+  /* ── HERO STRIP ──────────────────────────────────── */
   .hero {
     background: var(--ink);
     color: var(--bg);
-    padding: 64px 32px 56px;
+    padding: 28px 24px 32px;
+    border-bottom: 3px solid var(--accent);
     position: relative;
     overflow: hidden;
   }
-
-  /* Decorative background pattern */
   .hero::before {
-    content: '';
+    content: 'ES';
     position: absolute;
-    inset: 0;
-    background-image:
-      repeating-linear-gradient(
-        0deg,
-        transparent,
-        transparent 39px,
-        rgba(255,255,255,0.03) 39px,
-        rgba(255,255,255,0.03) 40px
-      ),
-      repeating-linear-gradient(
-        90deg,
-        transparent,
-        transparent 39px,
-        rgba(255,255,255,0.03) 39px,
-        rgba(255,255,255,0.03) 40px
-      );
+    right: -10px;
+    top: -20px;
+    font-family: 'Fraunces', serif;
+    font-size: 9rem;
+    font-weight: 700;
+    color: rgba(255,255,255,0.04);
+    line-height: 1;
     pointer-events: none;
+    letter-spacing: -0.05em;
+  }
+  .hero-inner { max-width: 720px; margin: 0 auto; }
+  .hero p {
+    font-size: 0.85rem;
+    color: #b0a898;
+    line-height: 1.6;
+    max-width: 480px;
+  }
+  .hero .teacher-intro {
+    display: none;
+    font-size: 0.8rem;
+    color: var(--gold);
+    margin-top: 8px;
+    padding: 6px 12px;
+    border-left: 2px solid var(--gold);
   }
 
-  .hero-inner {
+  /* ── MAIN CONTENT ────────────────────────────────── */
+  main {
     max-width: 720px;
     margin: 0 auto;
-    position: relative;
+    padding: 32px 20px 60px;
   }
 
-  .hero-eyebrow {
-    font-size: 0.72rem;
-    letter-spacing: 0.2em;
-    text-transform: uppercase;
-    color: var(--gold);
-    margin-bottom: 20px;
+  /* ── CATEGORY SECTION ────────────────────────────── */
+  .category {
+    margin-bottom: 40px;
+  }
+  .category-header {
     display: flex;
     align-items: center;
     gap: 10px;
-  }
-  .hero-eyebrow::before {
-    content: '';
-    display: block;
-    width: 32px;
-    height: 1px;
-    background: var(--gold);
-  }
-
-  .hero h1 {
-    font-family: 'Fraunces', serif;
-    font-weight: 700;
-    font-size: clamp(2.4rem, 6vw, 3.8rem);
-    line-height: 1.05;
-    letter-spacing: -0.03em;
     margin-bottom: 16px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid var(--border);
   }
-
-  .hero h1 em {
-    font-style: italic;
-    font-weight: 300;
-    color: var(--gold);
+  .category-icon {
+    font-size: 1.1rem;
+    line-height: 1;
   }
-
-  .hero-sub {
-    font-size: 1rem;
-    color: #aaa;
-    line-height: 1.7;
-    max-width: 480px;
+  .category-title {
+    font-family: 'Fraunces', serif;
+    font-size: 1.1rem;
+    font-weight: 700;
+    letter-spacing: -0.01em;
+    color: var(--ink);
   }
-
-  /* ── MAIN CONTENT ── */
-  .content {
-    max-width: 720px;
-    margin: 0 auto;
-    padding: 48px 24px 80px;
-  }
-
-  .section-label {
-    font-size: 0.68rem;
-    letter-spacing: 0.18em;
+  .category-count {
+    font-size: 0.65rem;
+    letter-spacing: 0.08em;
     text-transform: uppercase;
     color: var(--muted);
-    margin-bottom: 20px;
-    display: flex;
-    align-items: center;
-    gap: 12px;
-  }
-  .section-label::after {
-    content: '';
-    flex: 1;
-    height: 1px;
-    background: var(--border);
+    margin-left: auto;
   }
 
-  /* ── TOOL CARDS ── */
-  .tools-grid {
-    display: flex;
-    flex-direction: column;
+  /* ── TOOL GRID ───────────────────────────────────── */
+  .tool-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
     gap: 12px;
-    margin-bottom: 56px;
   }
 
+  /* ── TOOL CARD ───────────────────────────────────── */
   .tool-card {
-    display: flex;
-    align-items: center;
     background: var(--card);
     border: 1px solid var(--border);
     border-radius: 10px;
-    padding: 20px 24px;
+    padding: 16px 18px;
     text-decoration: none;
-    color: var(--ink);
-    box-shadow: 2px 2px 0 var(--border);
+    color: inherit;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
     transition: transform 0.15s, box-shadow 0.15s, border-color 0.15s;
-    gap: 20px;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+  }
+  .tool-card::after {
+    content: '';
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    height: 3px;
+    background: var(--accent);
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 0.2s ease;
   }
   .tool-card:hover {
-    transform: translate(-2px, -2px);
-    box-shadow: 4px 4px 0 var(--border);
-    border-color: var(--ink);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px var(--shadow);
+    border-color: #c4b99a;
+  }
+  .tool-card:hover::after {
+    transform: scaleX(1);
   }
 
-  .tool-card-icon {
-    font-size: 1.6rem;
-    flex-shrink: 0;
-    width: 48px;
-    height: 48px;
-    background: var(--bg);
-    border-radius: 8px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border: 1px solid var(--border);
+  .tool-card.teacher-card {
+    border-style: dashed;
+    border-color: rgba(212,160,23,0.4);
+    background: rgba(212,160,23,0.04);
+  }
+  .tool-card.teacher-card::after {
+    background: var(--gold);
+  }
+  .tool-card.teacher-card:hover {
+    border-color: var(--gold);
+    border-style: solid;
   }
 
-  .tool-card-body {
-    flex: 1;
-  }
-
-  .tool-card-title {
-    font-family: 'Fraunces', serif;
-    font-weight: 400;
-    font-size: 1.15rem;
-    letter-spacing: -0.01em;
-    margin-bottom: 3px;
-  }
-
-  .tool-card-meta {
-    font-size: 0.75rem;
-    color: var(--muted);
-    letter-spacing: 0.03em;
-  }
-
-  .tool-card-meta span {
-    display: inline-block;
-    margin-right: 12px;
-  }
-
-  .tool-card-arrow {
-    font-size: 1.1rem;
-    color: var(--muted);
-    flex-shrink: 0;
-    transition: transform 0.15s, color 0.15s;
-  }
-  .tool-card:hover .tool-card-arrow {
-    transform: translateX(3px);
-    color: var(--accent);
-  }
-
-  /* Coming soon card */
-  .tool-card.soon {
-    opacity: 0.5;
-    pointer-events: none;
-    cursor: default;
-  }
-  .tool-card.soon:hover {
-    transform: none;
-    box-shadow: 2px 2px 0 var(--border);
-    border-color: var(--border);
-  }
-  .badge-soon {
-    font-size: 0.62rem;
+  .card-badge {
+    font-size: 0.58rem;
     letter-spacing: 0.1em;
     text-transform: uppercase;
-    background: var(--border);
-    color: var(--muted);
-    padding: 3px 8px;
-    border-radius: 20px;
-    flex-shrink: 0;
+    font-weight: 700;
+    padding: 2px 6px;
+    border-radius: 3px;
+    display: inline-block;
+    width: fit-content;
+    margin-bottom: 2px;
   }
+  .badge-vocab  { background: rgba(200,57,26,0.1);  color: var(--accent); }
+  .badge-search { background: rgba(212,160,23,0.15); color: #996d00; }
+  .badge-listen { background: rgba(45,106,45,0.1);  color: var(--green); }
+  .badge-grammar{ background: rgba(60,80,180,0.1);  color: #3c50b4; }
 
-  /* ── HOW TO USE ── */
-  .modes-row {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
-    gap: 10px;
-    margin-bottom: 48px;
-  }
-
-  .mode-chip {
-    background: var(--card);
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    padding: 14px 12px;
-    text-align: center;
-  }
-  .mode-chip-icon { font-size: 1.3rem; margin-bottom: 6px; }
-  .mode-chip-name {
-    font-size: 0.72rem;
-    letter-spacing: 0.05em;
+  .card-title {
+    font-family: 'Fraunces', serif;
+    font-size: 0.95rem;
+    font-weight: 700;
+    line-height: 1.25;
     color: var(--ink);
-    font-weight: 600;
   }
-  .mode-chip-desc {
-    font-size: 0.65rem;
+  .card-subtitle {
+    font-size: 0.7rem;
     color: var(--muted);
-    margin-top: 2px;
     line-height: 1.4;
   }
+  .card-arrow {
+    margin-top: auto;
+    padding-top: 8px;
+    font-size: 0.65rem;
+    letter-spacing: 0.06em;
+    color: var(--accent);
+    text-transform: uppercase;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+  .teacher-card .card-arrow { color: var(--gold); }
 
-  /* ── FOOTER ── */
-  footer {
+  .teacher-label {
+    position: absolute;
+    top: 10px; right: 12px;
+    font-size: 0.7rem;
+    opacity: 0.5;
+  }
+
+  /* ── STATS BAR ───────────────────────────────────── */
+  .stats-bar {
+    display: flex;
+    gap: 24px;
+    flex-wrap: wrap;
+    padding: 18px 0 0;
+    margin-bottom: 36px;
     border-top: 1px solid var(--border);
-    padding: 24px;
-    text-align: center;
-    font-size: 0.72rem;
+  }
+  .stat {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+  .stat-value {
+    font-family: 'Fraunces', serif;
+    font-size: 1.5rem;
+    font-weight: 700;
+    line-height: 1;
+    color: var(--ink);
+  }
+  .stat-label {
+    font-size: 0.65rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
     color: var(--muted);
-    letter-spacing: 0.04em;
   }
 
-  /* ── ANIMATIONS ── */
-  .hero-inner, .tool-card, .modes-row {
-    animation: fadeUp 0.5s ease both;
+  /* ── TEACHER NOTICE ──────────────────────────────── */
+  .teacher-notice {
+    display: none;
+    background: rgba(212,160,23,0.08);
+    border: 1px solid rgba(212,160,23,0.3);
+    border-radius: 8px;
+    padding: 14px 16px;
+    margin-bottom: 28px;
+    font-size: 0.78rem;
+    color: #7a5800;
+    line-height: 1.5;
   }
-  .tool-card:nth-child(1) { animation-delay: 0.05s; }
-  .tool-card:nth-child(2) { animation-delay: 0.10s; }
-  .tool-card:nth-child(3) { animation-delay: 0.15s; }
-  .tool-card:nth-child(4) { animation-delay: 0.20s; }
-  .tool-card:nth-child(5) { animation-delay: 0.25s; }
-
-  @keyframes fadeUp {
-    from { opacity: 0; transform: translateY(16px); }
-    to   { opacity: 1; transform: translateY(0); }
+  .teacher-notice strong {
+    display: block;
+    font-weight: 700;
+    margin-bottom: 3px;
+    color: #5c4000;
   }
 
-  @media (max-width: 480px) {
-    .hero { padding: 48px 20px 40px; }
-    .content { padding: 32px 16px 64px; }
-    .tool-card { padding: 16px; }
-    .modes-row { grid-template-columns: repeat(3, 1fr); }
+  /* ── FOOTER ──────────────────────────────────────── */
+  footer {
+    text-align: center;
+    padding: 20px;
+    font-size: 0.65rem;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--muted);
+    border-top: 1px solid var(--border);
+  }
+
+  /* ── RESPONSIVE ──────────────────────────────────── */
+  @media (max-width: 500px) {
+    header { gap: 8px; padding: 0 16px; }
+    .tool-grid { grid-template-columns: 1fr 1fr; }
+    .stats-bar { gap: 16px; }
+  }
+  @media (max-width: 360px) {
+    .tool-grid { grid-template-columns: 1fr; }
   }
 </style>
 </head>
 <body>
 
+<!-- ══════ HEADER ═══════════════════════════════════════ -->
+<header>
+  <div class="header-brand">
+    <h1>Español</h1>
+    <span class="level-badge">A2+</span>
+  </div>
+  <div class="tab-toggle">
+    <button class="active" onclick="setMode('student')" id="btn-student">Cursisten</button>
+    <button onclick="setMode('teacher')" id="btn-teacher">Docenten <span class="teacher-icon">🔑</span></button>
+  </div>
+</header>
+
+<!-- ══════ HERO ══════════════════════════════════════════ -->
 <div class="hero">
   <div class="hero-inner">
-    <div class="hero-eyebrow">Woordenschat oefenen</div>
-    <h1>Aprende<br><em>español</em></h1>
-    <p class="hero-sub">Interactieve oefentools per thema. Kies een onderwerp en oefen in vijf verschillende werkvormen, in beide richtingen.</p>
+    <p id="hero-text">Kies een oefening om te beginnen. De tools werken op je telefoon, tablet en computer.</p>
+    <p class="teacher-intro" id="teacher-intro">Docentenweergave — je ziet ook zoekplaatjes en aanvullend materiaal. Cursisten zien deze items niet.</p>
   </div>
 </div>
 
-<div class="content">
+<!-- ══════ MAIN ══════════════════════════════════════════ -->
+<main>
 
-  <div class="section-label">Beschikbare thema's</div>
-
-  <div class="tools-grid">
-
-    <a class="tool-card" href="vliegtuig-vertraging/">
-      <div class="tool-card-icon">✈️</div>
-      <div class="tool-card-body">
-        <div class="tool-card-title">Vliegtuig vertraging</div>
-        <div class="tool-card-meta">
-          <span>15 woorden</span>
-          <span>A2</span>
-        </div>
-      </div>
-      <div class="tool-card-arrow">→</div>
-    </a>
-	
-	<a class="tool-card" href="vliegtuig-vertraging_deel-2/">
-      <div class="tool-card-icon">✈️</div>
-      <div class="tool-card-body">
-        <div class="tool-card-title">Vliegtuig vertraging (deel 2)</div>
-        <div class="tool-card-meta">
-          <span>15 woorden</span>
-          <span>A2</span>
-        </div>
-      </div>
-      <div class="tool-card-arrow">→</div>
-    </a>
-
+  <div class="teacher-notice" id="teacher-notice">
+    <strong>Docentenweergave</strong>
+    Kaarten met een gouden rand zijn exclusief voor de docent (zoekplaatjes, luisterfragmenten). Deel dit tabblad niet met cursisten.
   </div>
 
-</div>
+  <!-- STATS -->
+  <div class="stats-bar" id="stats-bar">
+    <!-- filled by JS -->
+  </div>
+
+  <!-- TOOL SECTIONS — filled by JS -->
+  <div id="sections"></div>
+
+</main>
+
+<footer>
+  Español A2+ · Oefenmateriaal · <span id="year"></span>
+</footer>
+
+<script>
+// ════════════════════════════════════════════════════
+//  DATA — voeg hier nieuwe tools toe
+// ════════════════════════════════════════════════════
+
+const TOOLS = [
+  // ── WOORDENSCHAT ──────────────────────────────────
+  {
+    category:    'Woordenschat',
+    categoryIcon:'📚',
+    title:       'Vliegtuigvertraging 1',
+    subtitle:    '15 woorden · 5 spelmodi',
+    badge:       'vocab',
+    badgeLabel:  'Woordenschat',
+    href:        'woordenschat_vliegtuig-vertraging.html',
+    teacherOnly: false,
+  },
+  {
+    category:    'Woordenschat',
+    categoryIcon:'📚',
+    title:       'Vliegtuigvertraging 2',
+    subtitle:    '15 woorden · 5 spelmodi',
+    badge:       'vocab',
+    badgeLabel:  'Woordenschat',
+    href:        'vliegtuig2/index.html',   // pas aan zodra het bestand er is
+    teacherOnly: false,
+  },
+  {
+    category:    'Woordenschat',
+    categoryIcon:'📚',
+    title:       'Verhuizen',
+    subtitle:    '15 woorden · 5 spelmodi',
+    badge:       'vocab',
+    badgeLabel:  'Woordenschat',
+    href:        'verhuizen/index.html',    // pas aan na deployment
+    teacherOnly: false,
+  },
+
+  // ── DOCENTENMATERIAAL ─────────────────────────────
+  {
+    category:    'Docentenmateriaal',
+    categoryIcon:'🔑',
+    title:       'Zoekplaatje — Vliegtuig',
+    subtitle:    'Pinnen op de afbeelding · live gebruik',
+    badge:       'search',
+    badgeLabel:  'Zoekplaatje',
+    href:        'zoekplaatje-vliegtuig.html',
+    teacherOnly: true,
+  },
+];
+
+// ════════════════════════════════════════════════════
+//  RENDER
+// ════════════════════════════════════════════════════
+
+let currentMode = 'student';
+
+function setMode(mode) {
+  currentMode = mode;
+  document.getElementById('btn-student').classList.toggle('active', mode === 'student');
+  document.getElementById('btn-teacher').classList.toggle('active', mode === 'teacher');
+  document.getElementById('teacher-notice').style.display   = mode === 'teacher' ? 'block' : 'none';
+  document.getElementById('teacher-intro').style.display    = mode === 'teacher' ? 'block' : 'none';
+  document.getElementById('hero-text').style.display        = mode === 'student' ? 'block' : 'none';
+  render();
+}
+
+function render() {
+  const visibleTools = currentMode === 'teacher'
+    ? TOOLS
+    : TOOLS.filter(t => !t.teacherOnly);
+
+  // Stats
+  const vocabCount = visibleTools.filter(t => t.badge === 'vocab').length;
+  const totalWords = vocabCount * 15;
+  const statsBar = document.getElementById('stats-bar');
+  statsBar.innerHTML = `
+    <div class="stat"><div class="stat-value">${vocabCount}</div><div class="stat-label">Woordenlijsten</div></div>
+    <div class="stat"><div class="stat-value">${totalWords}</div><div class="stat-label">Woorden totaal</div></div>
+    ${currentMode === 'teacher' ? `<div class="stat"><div class="stat-value">${TOOLS.filter(t=>t.teacherOnly).length}</div><div class="stat-label">Docentenitems</div></div>` : ''}
+  `;
+
+  // Group by category — preserving order of first appearance
+  const cats = [];
+  const catMap = {};
+  visibleTools.forEach(t => {
+    if (!catMap[t.category]) {
+      catMap[t.category] = [];
+      cats.push(t.category);
+    }
+    catMap[t.category].push(t);
+  });
+
+  const sectionsEl = document.getElementById('sections');
+  sectionsEl.innerHTML = '';
+
+  cats.forEach(cat => {
+    const tools = catMap[cat];
+    const firstTool = TOOLS.find(t => t.category === cat);
+    const icon = firstTool ? firstTool.categoryIcon : '📄';
+
+    const section = document.createElement('div');
+    section.className = 'category';
+
+    const header = `
+      <div class="category-header">
+        <span class="category-icon">${icon}</span>
+        <span class="category-title">${cat}</span>
+        <span class="category-count">${tools.length} item${tools.length !== 1 ? 's' : ''}</span>
+      </div>
+    `;
+
+    const cards = tools.map(t => `
+      <a class="tool-card${t.teacherOnly ? ' teacher-card' : ''}" href="${t.href}">
+        ${t.teacherOnly ? '<span class="teacher-label">🔑</span>' : ''}
+        <span class="card-badge badge-${t.badge}">${t.badgeLabel}</span>
+        <div class="card-title">${t.title}</div>
+        <div class="card-subtitle">${t.subtitle}</div>
+        <div class="card-arrow">Openen →</div>
+      </a>
+    `).join('');
+
+    section.innerHTML = header + `<div class="tool-grid">${cards}</div>`;
+    sectionsEl.appendChild(section);
+  });
+}
+
+// Init
+document.getElementById('year').textContent = new Date().getFullYear();
+render();
+</script>
 
 </body>
 </html>
