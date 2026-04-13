@@ -1,0 +1,1703 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#1a1208">
+<title>Presupuesto de Mudanza — Español A2+</title>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,700;1,9..144,300&family=Nunito:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #f5f0e8;
+  --ink: #1a1208;
+  --accent: #c8391a;
+  --gold: #d4a017;
+  --muted: #8a7a62;
+  --card: #fffdf7;
+  --border: #d4c9b0;
+  --green: #2d6a2d;
+  --shadow: rgba(26,18,8,0.10);
+  --header-h: 54px;
+  --sticky-casus-h: 56px;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+html { scroll-behavior: smooth; }
+body {
+  background: var(--bg);
+  color: var(--ink);
+  font-family: 'Nunito', sans-serif;
+  min-height: 100vh;
+  line-height: 1.5;
+}
+
+/* ══════════════════════════════════════════════════════
+   HEADER
+═══════════════════════════════════════════════════════ */
+header {
+  background: var(--ink);
+  color: var(--bg);
+  padding: 0 20px;
+  height: var(--header-h);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+.header-back {
+  color: var(--bg);
+  text-decoration: none;
+  font-size: 1.2rem;
+  opacity: 0.6;
+  transition: opacity 0.2s;
+  display: flex;
+  align-items: center;
+}
+.header-back:hover { opacity: 1; }
+header h1 {
+  font-family: 'Fraunces', serif;
+  font-weight: 700;
+  font-size: 1.1rem;
+  letter-spacing: -0.02em;
+  flex: 1;
+}
+.header-badge {
+  font-size: 0.6rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--gold);
+  background: rgba(212,160,23,0.15);
+  border: 1px solid rgba(212,160,23,0.35);
+  border-radius: 3px;
+  padding: 2px 6px;
+}
+.header-user {
+  font-size: 0.72rem;
+  color: #aaa;
+}
+
+/* ══════════════════════════════════════════════════════
+   STICKY CASUS BANNER
+═══════════════════════════════════════════════════════ */
+.sticky-casus {
+  position: sticky;
+  top: var(--header-h);
+  z-index: 90;
+  background: linear-gradient(135deg, #fdfcfa 0%, #f8f4ed 100%);
+  border-bottom: 2px solid var(--gold);
+  box-shadow: 0 2px 8px var(--shadow);
+  transition: all 0.2s ease;
+}
+.sticky-casus.hidden {
+  display: none;
+}
+.sticky-casus-header {
+  display: flex;
+  align-items: center;
+  padding: 12px 20px;
+  cursor: pointer;
+  gap: 10px;
+  min-height: var(--sticky-casus-h);
+}
+.sticky-casus-icon {
+  font-size: 1.1rem;
+}
+.sticky-casus-title {
+  flex: 1;
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--gold);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+.sticky-casus-preview {
+  flex: 2;
+  font-size: 0.8rem;
+  color: var(--ink);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.sticky-casus-toggle {
+  background: none;
+  border: none;
+  font-size: 1rem;
+  cursor: pointer;
+  padding: 4px 8px;
+  color: var(--muted);
+  transition: transform 0.2s;
+}
+.sticky-casus.expanded .sticky-casus-toggle {
+  transform: rotate(180deg);
+}
+.sticky-casus-body {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.3s ease, padding 0.3s ease;
+  padding: 0 20px;
+  font-size: 0.88rem;
+  line-height: 1.6;
+  color: var(--ink);
+  background: rgba(212,160,23,0.06);
+}
+.sticky-casus.expanded .sticky-casus-body {
+  max-height: 300px;
+  padding: 16px 20px;
+  border-top: 1px solid var(--border);
+}
+
+/* Mobile: hide preview, always show full when expanded */
+@media (max-width: 600px) {
+  .sticky-casus-preview { display: none; }
+  .sticky-casus-header { padding: 10px 16px; }
+  .sticky-casus.expanded .sticky-casus-body { padding: 14px 16px; }
+}
+
+/* ══════════════════════════════════════════════════════
+   MAIN CONTAINER
+═══════════════════════════════════════════════════════ */
+main {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 24px 16px 80px;
+}
+
+/* ══════════════════════════════════════════════════════
+   VIEWS (show/hide)
+═══════════════════════════════════════════════════════ */
+.view { display: none; }
+.view.active { display: block; }
+
+/* ══════════════════════════════════════════════════════
+   SETUP MODAL (naam invoeren)
+═══════════════════════════════════════════════════════ */
+.modal-bg {
+  position: fixed;
+  inset: 0;
+  background: rgba(26,18,8,0.75);
+  z-index: 500;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+.modal-bg.hidden { display: none; }
+.modal {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 28px 24px;
+  width: 100%;
+  max-width: 380px;
+  box-shadow: 5px 5px 0 var(--border);
+}
+.modal h2 {
+  font-family: 'Fraunces', serif;
+  font-size: 1.4rem;
+  font-weight: 700;
+  margin-bottom: 6px;
+}
+.modal p {
+  font-size: 0.82rem;
+  color: var(--muted);
+  margin-bottom: 20px;
+  line-height: 1.6;
+}
+.field-label {
+  font-size: 0.65rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 6px;
+  display: block;
+}
+.field-input {
+  width: 100%;
+  padding: 12px 14px;
+  background: var(--bg);
+  border: 1.5px solid var(--border);
+  border-radius: 8px;
+  font-family: 'Nunito', sans-serif;
+  font-size: max(16px, 1rem);
+  color: var(--ink);
+  outline: none;
+  margin-bottom: 16px;
+  transition: border-color 0.2s;
+}
+.field-input:focus { border-color: var(--ink); }
+.modal-submit {
+  width: 100%;
+  padding: 14px;
+  background: var(--ink);
+  color: var(--bg);
+  border: none;
+  border-radius: 10px;
+  font-family: 'Nunito', sans-serif;
+  font-size: 1rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: opacity 0.15s;
+}
+.modal-submit:hover { opacity: 0.85; }
+
+/* ══════════════════════════════════════════════════════
+   SCENARIO SELECTION
+═══════════════════════════════════════════════════════ */
+.section-title {
+  font-family: 'Fraunces', serif;
+  font-size: 1.3rem;
+  font-weight: 700;
+  margin-bottom: 8px;
+}
+.section-subtitle {
+  font-size: 0.85rem;
+  color: var(--muted);
+  margin-bottom: 24px;
+}
+
+.scenario-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 16px;
+}
+
+.scenario-card {
+  background: var(--card);
+  border: 2px solid var(--border);
+  border-radius: 12px;
+  padding: 20px;
+  cursor: pointer;
+  transition: all 0.2s;
+  position: relative;
+  overflow: hidden;
+}
+.scenario-card:hover {
+  border-color: var(--accent);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px var(--shadow);
+}
+.scenario-card.completed {
+  border-color: var(--green);
+}
+.scenario-card.completed::before {
+  content: '✓';
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  background: var(--green);
+  color: white;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+
+.scenario-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+.scenario-icon {
+  font-size: 1.8rem;
+  line-height: 1;
+}
+.scenario-title {
+  font-family: 'Fraunces', serif;
+  font-size: 1.05rem;
+  font-weight: 700;
+}
+.scenario-difficulty {
+  font-size: 0.7rem;
+  color: var(--gold);
+  letter-spacing: 0.05em;
+}
+.scenario-desc {
+  font-size: 0.8rem;
+  color: var(--muted);
+  line-height: 1.5;
+  margin-top: 8px;
+}
+
+/* ══════════════════════════════════════════════════════
+   FORM VIEW
+═══════════════════════════════════════════════════════ */
+.form-section {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 20px;
+  margin-bottom: 20px;
+}
+.form-section-title {
+  font-family: 'Fraunces', serif;
+  font-size: 1rem;
+  font-weight: 700;
+  margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.form-section-title .icon {
+  font-size: 1.1rem;
+}
+
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+@media (max-width: 500px) {
+  .form-row { grid-template-columns: 1fr; }
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.form-group label {
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+.form-group input,
+.form-group select {
+  padding: 10px 12px;
+  border: 1.5px solid var(--border);
+  border-radius: 8px;
+  font-family: 'Nunito', sans-serif;
+  font-size: 0.9rem;
+  background: var(--bg);
+  color: var(--ink);
+  transition: border-color 0.2s;
+}
+.form-group input:focus,
+.form-group select:focus {
+  outline: none;
+  border-color: var(--ink);
+}
+
+/* ── INVENTORY GRID ─────────────────────────────────── */
+.inventory-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 10px;
+}
+
+.inventory-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  background: var(--bg);
+  border: 1.5px solid var(--border);
+  border-radius: 8px;
+  transition: all 0.15s;
+}
+.inventory-item.has-qty {
+  border-color: var(--accent);
+  background: rgba(200,57,26,0.04);
+}
+.inventory-item .item-name {
+  flex: 1;
+  font-size: 0.85rem;
+  color: var(--ink);
+}
+.inventory-item .item-qty {
+  width: 52px;
+  padding: 6px 8px;
+  border: 1.5px solid var(--border);
+  border-radius: 6px;
+  font-family: 'Nunito', sans-serif;
+  font-size: 0.9rem;
+  text-align: center;
+  background: white;
+  color: var(--ink);
+}
+.inventory-item .item-qty:focus {
+  outline: none;
+  border-color: var(--accent);
+}
+
+/* ── SERVICES ───────────────────────────────────────── */
+.services-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 10px;
+}
+.service-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 14px;
+  background: var(--bg);
+  border: 1.5px solid var(--border);
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.15s;
+  user-select: none;
+}
+.service-item:hover {
+  border-color: var(--muted);
+}
+.service-item.selected {
+  border-color: var(--green);
+  background: rgba(45,106,45,0.06);
+}
+.service-item input[type="checkbox"] {
+  display: none;
+}
+.service-check {
+  width: 20px;
+  height: 20px;
+  border: 2px solid var(--border);
+  border-radius: 5px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.15s;
+  flex-shrink: 0;
+}
+.service-item.selected .service-check {
+  background: var(--green);
+  border-color: var(--green);
+  color: white;
+}
+.service-check::after {
+  content: '✓';
+  font-size: 0.75rem;
+  opacity: 0;
+}
+.service-item.selected .service-check::after {
+  opacity: 1;
+}
+.service-label {
+  font-size: 0.85rem;
+  color: var(--ink);
+}
+
+/* ── SUBMIT BUTTON ──────────────────────────────────── */
+.form-actions {
+  display: flex;
+  gap: 12px;
+  margin-top: 24px;
+  flex-wrap: wrap;
+}
+.btn {
+  padding: 14px 28px;
+  border-radius: 10px;
+  font-family: 'Nunito', sans-serif;
+  font-size: 0.95rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.15s;
+  border: 2px solid transparent;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+.btn-primary {
+  background: var(--accent);
+  color: white;
+  border-color: var(--accent);
+}
+.btn-primary:hover {
+  background: #a82d15;
+  border-color: #a82d15;
+}
+.btn-secondary {
+  background: transparent;
+  color: var(--ink);
+  border-color: var(--border);
+}
+.btn-secondary:hover {
+  border-color: var(--ink);
+}
+.btn-gold {
+  background: var(--gold);
+  color: var(--ink);
+  border-color: var(--gold);
+}
+.btn-gold:hover {
+  background: #b8900f;
+  border-color: #b8900f;
+}
+
+/* ══════════════════════════════════════════════════════
+   PRESUPUESTO RESULT
+═══════════════════════════════════════════════════════ */
+.presupuesto-container {
+  background: var(--card);
+  border: 2px solid var(--border);
+  border-radius: 14px;
+  overflow: hidden;
+}
+.presupuesto-header {
+  background: var(--ink);
+  color: var(--bg);
+  padding: 20px 24px;
+  text-align: center;
+}
+.presupuesto-header h2 {
+  font-family: 'Fraunces', serif;
+  font-size: 1.4rem;
+  font-weight: 700;
+  margin-bottom: 4px;
+}
+.presupuesto-header p {
+  font-size: 0.75rem;
+  opacity: 0.7;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+.presupuesto-body {
+  padding: 24px;
+}
+.presupuesto-section {
+  margin-bottom: 20px;
+}
+.presupuesto-section:last-child {
+  margin-bottom: 0;
+}
+.presupuesto-section-title {
+  font-size: 0.68rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 8px;
+  font-weight: 700;
+}
+.presupuesto-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 8px 0;
+  border-bottom: 1px solid var(--border);
+  font-size: 0.88rem;
+}
+.presupuesto-row:last-child {
+  border-bottom: none;
+}
+.presupuesto-row .label { color: var(--ink); }
+.presupuesto-row .value { font-weight: 600; color: var(--ink); }
+
+.presupuesto-total {
+  background: var(--bg);
+  border-radius: 10px;
+  padding: 16px 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 20px;
+}
+.presupuesto-total .label {
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+.presupuesto-total .price {
+  font-family: 'Fraunces', serif;
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: var(--accent);
+}
+
+.presupuesto-actions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-top: 24px;
+}
+
+/* ══════════════════════════════════════════════════════
+   ANSWER COMPARISON
+═══════════════════════════════════════════════════════ */
+.answer-section {
+  margin-top: 32px;
+  padding-top: 24px;
+  border-top: 2px dashed var(--border);
+}
+.answer-toggle-container {
+  text-align: center;
+  margin-bottom: 20px;
+}
+.answer-container {
+  display: none;
+}
+.answer-container.visible {
+  display: block;
+}
+.comparison-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+@media (max-width: 600px) {
+  .comparison-grid { grid-template-columns: 1fr; }
+}
+.comparison-column {
+  background: var(--card);
+  border: 2px solid var(--border);
+  border-radius: 12px;
+  overflow: hidden;
+}
+.comparison-column.correct {
+  border-color: var(--green);
+}
+.comparison-header {
+  padding: 12px 16px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  text-align: center;
+}
+.comparison-column:first-child .comparison-header {
+  background: var(--bg);
+  color: var(--muted);
+}
+.comparison-column.correct .comparison-header {
+  background: var(--green);
+  color: white;
+}
+.comparison-body {
+  padding: 16px;
+}
+.comparison-item {
+  display: flex;
+  justify-content: space-between;
+  padding: 6px 0;
+  font-size: 0.82rem;
+  border-bottom: 1px solid var(--border);
+}
+.comparison-item:last-child { border-bottom: none; }
+.comparison-item .name { color: var(--ink); }
+.comparison-item .qty { font-weight: 600; }
+.comparison-item.match { color: var(--green); }
+.comparison-item.missing { color: var(--accent); }
+.comparison-item.extra { color: var(--gold); }
+
+.comparison-legend {
+  display: flex;
+  gap: 16px;
+  justify-content: center;
+  margin-top: 16px;
+  font-size: 0.75rem;
+  color: var(--muted);
+}
+.comparison-legend span {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+.legend-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+}
+.legend-dot.match { background: var(--green); }
+.legend-dot.missing { background: var(--accent); }
+.legend-dot.extra { background: var(--gold); }
+
+/* ══════════════════════════════════════════════════════
+   TOAST
+═══════════════════════════════════════════════════════ */
+.toast {
+  position: fixed;
+  bottom: 24px;
+  left: 50%;
+  transform: translateX(-50%) translateY(80px);
+  background: var(--ink);
+  color: var(--bg);
+  padding: 12px 24px;
+  border-radius: 25px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  opacity: 0;
+  transition: transform 0.3s, opacity 0.3s;
+  z-index: 999;
+  pointer-events: none;
+}
+.toast.show {
+  transform: translateX(-50%) translateY(0);
+  opacity: 1;
+}
+
+/* ══════════════════════════════════════════════════════
+   RESPONSIVE
+═══════════════════════════════════════════════════════ */
+@media (max-width: 500px) {
+  .inventory-grid { grid-template-columns: 1fr; }
+  .services-grid { grid-template-columns: 1fr; }
+  .scenario-grid { grid-template-columns: 1fr; }
+  .form-actions { flex-direction: column; }
+  .btn { width: 100%; justify-content: center; }
+  .presupuesto-actions { flex-direction: column; }
+}
+</style>
+</head>
+<body>
+
+<!-- ══════════════════════════════════════════════════════
+     HEADER
+═════════════════════════════════════════════════════════ -->
+<header>
+  <a href="index.html" class="header-back" title="Terug">←</a>
+  <h1>Presupuesto de Mudanza</h1>
+  <span class="header-badge">A2+</span>
+  <span class="header-user" id="header-user"></span>
+</header>
+
+<!-- ══════════════════════════════════════════════════════
+     STICKY CASUS BANNER (only visible during form)
+═════════════════════════════════════════════════════════ -->
+<div class="sticky-casus hidden" id="sticky-casus">
+  <div class="sticky-casus-header" onclick="toggleStickyCasus()">
+    <span class="sticky-casus-icon">📋</span>
+    <span class="sticky-casus-title">Situatie</span>
+    <span class="sticky-casus-preview" id="sticky-casus-preview"></span>
+    <button class="sticky-casus-toggle" aria-label="Toggle casus">▼</button>
+  </div>
+  <div class="sticky-casus-body" id="sticky-casus-body"></div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════
+     SETUP MODAL
+═════════════════════════════════════════════════════════ -->
+<div class="modal-bg" id="setup-modal">
+  <div class="modal">
+    <h2>¡Bienvenido!</h2>
+    <p>Voer je naam in om te beginnen met de opdracht.</p>
+
+    <label class="field-label">Jouw naam</label>
+    <input class="field-input" type="text" id="input-name" placeholder="bijv. Anna" maxlength="30"
+      onkeydown="if(event.key==='Enter') startApp()">
+
+    <button class="modal-submit" onclick="startApp()">Comenzar →</button>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════
+     MAIN CONTENT
+═════════════════════════════════════════════════════════ -->
+<main>
+
+  <!-- ═══ VIEW: SCENARIO SELECTION ═══════════════════════ -->
+  <div class="view" id="view-scenarios">
+    <h2 class="section-title">Elige tu situación</h2>
+    <p class="section-subtitle">Kies een scenario en vul het Spaanse formulier in om een offerte aan te vragen.</p>
+
+    <div class="scenario-grid" id="scenario-grid">
+      <!-- filled by JS -->
+    </div>
+  </div>
+
+  <!-- ═══ VIEW: FORM ═════════════════════════════════════ -->
+  <div class="view" id="view-form">
+
+    <!-- Form -->
+    <form id="mudanza-form" onsubmit="submitForm(event)">
+
+      <!-- SECTION: Datos de contacto -->
+      <div class="form-section">
+        <div class="form-section-title"><span class="icon">👤</span> Datos de contacto</div>
+        <div class="form-row">
+          <div class="form-group">
+            <label for="f-nombre">Nombre completo</label>
+            <input type="text" id="f-nombre" name="nombre" required>
+          </div>
+          <div class="form-group">
+            <label for="f-telefono">Teléfono</label>
+            <input type="tel" id="f-telefono" name="telefono" placeholder="+34 600 000 000" required>
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="f-email">Correo electrónico</label>
+          <input type="email" id="f-email" name="email" required>
+        </div>
+      </div>
+
+      <!-- SECTION: Origen y destino -->
+      <div class="form-section">
+        <div class="form-section-title"><span class="icon">📍</span> Origen y destino</div>
+        <div class="form-row">
+          <div class="form-group">
+            <label for="f-origen">Ciudad de origen</label>
+            <select id="f-origen" name="origen" required>
+              <option value="">— Selecciona —</option>
+              <option value="Amsterdam">Amsterdam (Países Bajos)</option>
+              <option value="Utrecht">Utrecht (Países Bajos)</option>
+              <option value="Rotterdam">Rotterdam (Países Bajos)</option>
+              <option value="Den Haag">La Haya (Países Bajos)</option>
+              <option value="Eindhoven">Eindhoven (Países Bajos)</option>
+              <option value="Groningen">Groningen (Países Bajos)</option>
+              <option value="Madrid">Madrid (España)</option>
+              <option value="Barcelona">Barcelona (España)</option>
+              <option value="Valencia">Valencia (España)</option>
+              <option value="Sevilla">Sevilla (España)</option>
+              <option value="Málaga">Málaga (España)</option>
+              <option value="Bilbao">Bilbao (España)</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="f-destino">Ciudad de destino</label>
+            <select id="f-destino" name="destino" required>
+              <option value="">— Selecciona —</option>
+              <option value="Madrid">Madrid (España)</option>
+              <option value="Barcelona">Barcelona (España)</option>
+              <option value="Valencia">Valencia (España)</option>
+              <option value="Sevilla">Sevilla (España)</option>
+              <option value="Málaga">Málaga (España)</option>
+              <option value="Salamanca">Salamanca (España)</option>
+              <option value="Granada">Granada (España)</option>
+              <option value="Alicante">Alicante (España)</option>
+              <option value="Bilbao">Bilbao (España)</option>
+              <option value="San Sebastián">San Sebastián (España)</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label for="f-tipo-origen">Tipo de vivienda (origen)</label>
+            <select id="f-tipo-origen" name="tipo_origen" required>
+              <option value="">— Selecciona —</option>
+              <option value="piso">Piso / Apartamento</option>
+              <option value="estudio">Estudio</option>
+              <option value="casa">Casa</option>
+              <option value="habitacion">Habitación</option>
+              <option value="oficina">Oficina</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="f-planta">Planta</label>
+            <select id="f-planta" name="planta" required>
+              <option value="">— Selecciona —</option>
+              <option value="baja">Planta baja</option>
+              <option value="1">Primera planta</option>
+              <option value="2">Segunda planta</option>
+              <option value="3">Tercera planta</option>
+              <option value="4">Cuarta planta</option>
+              <option value="5+">Quinta o superior</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label for="f-ascensor">¿Hay ascensor?</label>
+            <select id="f-ascensor" name="ascensor" required>
+              <option value="">— Selecciona —</option>
+              <option value="si">Sí</option>
+              <option value="no">No</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="f-fecha">Fecha preferida</label>
+            <input type="date" id="f-fecha" name="fecha" required>
+          </div>
+        </div>
+      </div>
+
+      <!-- SECTION: Inventario -->
+      <div class="form-section">
+        <div class="form-section-title"><span class="icon">📦</span> Inventario — ¿Qué quieres trasladar?</div>
+        <p style="font-size:0.78rem; color:var(--muted); margin-bottom:16px;">
+          Indica la cantidad de cada artículo. Deja en 0 los artículos que no llevas.
+        </p>
+        <div class="inventory-grid" id="inventory-grid">
+          <!-- filled by JS -->
+        </div>
+      </div>
+
+      <!-- SECTION: Servicios -->
+      <div class="form-section">
+        <div class="form-section-title"><span class="icon">🛠️</span> Servicios adicionales</div>
+        <div class="services-grid" id="services-grid">
+          <!-- filled by JS -->
+        </div>
+      </div>
+
+      <!-- SECTION: Comentarios -->
+      <div class="form-section">
+        <div class="form-section-title"><span class="icon">💬</span> Comentarios adicionales</div>
+        <div class="form-group">
+          <label for="f-comentarios">¿Algo más que debamos saber?</label>
+          <textarea id="f-comentarios" name="comentarios" rows="3" 
+            style="width:100%; padding:12px; border:1.5px solid var(--border); border-radius:8px; font-family:'Nunito',sans-serif; font-size:0.9rem; background:var(--bg); resize:vertical;"
+            placeholder="Por ejemplo: el piano necesita cuidado especial..."></textarea>
+        </div>
+      </div>
+
+      <!-- Actions -->
+      <div class="form-actions">
+        <button type="button" class="btn btn-secondary" onclick="backToScenarios()">← Volver</button>
+        <button type="submit" class="btn btn-primary">Solicitar presupuesto →</button>
+      </div>
+
+    </form>
+  </div>
+
+  <!-- ═══ VIEW: PRESUPUESTO RESULT ═══════════════════════ -->
+  <div class="view" id="view-result">
+    <div class="presupuesto-container" id="presupuesto-container">
+      <div class="presupuesto-header">
+        <h2>Presupuesto de Mudanza</h2>
+        <p>Referencia: <span id="ref-number">MUD-000000</span></p>
+      </div>
+      <div class="presupuesto-body" id="presupuesto-body">
+        <!-- filled by JS -->
+      </div>
+    </div>
+
+    <div class="presupuesto-actions">
+      <button class="btn btn-primary" onclick="copyPresupuesto()">📋 Kopieer tekst</button>
+      <button class="btn btn-secondary" onclick="backToScenarios()">← Nieuw scenario</button>
+    </div>
+
+    <!-- Answer comparison section -->
+    <div class="answer-section">
+      <div class="answer-toggle-container">
+        <button class="btn btn-gold" onclick="toggleAnswer()" id="answer-toggle-btn">
+          👁️ Bekijk het juiste antwoord
+        </button>
+      </div>
+      <div class="answer-container" id="answer-container">
+        <!-- filled by JS -->
+      </div>
+    </div>
+  </div>
+
+</main>
+
+<!-- Toast -->
+<div class="toast" id="toast"></div>
+
+<!-- ══════════════════════════════════════════════════════
+     APP LOGIC (no Firebase)
+═════════════════════════════════════════════════════════ -->
+<script>
+// ══════════════════════════════════════════════════════
+//  DATA: SCENARIOS with expected answers
+// ══════════════════════════════════════════════════════
+const SCENARIOS = [
+  {
+    id: 'estudiante',
+    icon: '🎓',
+    title: 'El estudiante',
+    difficulty: '⭐',
+    difficultyLabel: 'Makkelijk',
+    shortDesc: 'Student verhuist naar Spanje voor studie',
+    casus: `Je bent een 19-jarige student. Je hebt een kamer gehuurd in Utrecht en gaat nu studeren in Salamanca. Je neemt alleen je persoonlijke spullen mee: je bed, bureau, bureaustoel, twee boekenplanken vol studieboeken, je kleding (3 koffers), en je fiets. Je ouders helpen met de kosten, dus je wilt de goedkoopste optie.`,
+    expectedInventory: [
+      { id: 'cama_individual', qty: 1 },
+      { id: 'escritorio', qty: 1 },
+      { id: 'silla_escritorio', qty: 1 },
+      { id: 'estanteria', qty: 2 },
+      { id: 'maletas', qty: 3 },
+      { id: 'bicicleta', qty: 1 }
+    ],
+    expectedServices: ['embalaje_basico']
+  },
+  {
+    id: 'pareja',
+    icon: '💑',
+    title: 'La pareja joven',
+    difficulty: '⭐⭐',
+    difficultyLabel: 'Gemiddeld',
+    shortDesc: 'Jong stel verhuist naar een koopwoning',
+    casus: `Jullie zijn een stel van eind twintig. Jullie verhuizen van een huurappartement in Amsterdam naar een koopwoning in Valencia. Jullie nemen mee: een tweepersoons bed met nachtkastjes, een driezitsbank, een salontafel, een eettafel met vier stoelen, een kledingkast, een wasmachine, een koelkast, en ongeveer 15 verhuisdozen met persoonlijke spullen. Jullie willen dat de verhuizers de meubels ook weer in elkaar zetten in Valencia.`,
+    expectedInventory: [
+      { id: 'cama_doble', qty: 1 },
+      { id: 'mesita_noche', qty: 2 },
+      { id: 'sofa_3plazas', qty: 1 },
+      { id: 'mesa_centro', qty: 1 },
+      { id: 'mesa_comedor', qty: 1 },
+      { id: 'silla', qty: 4 },
+      { id: 'armario', qty: 1 },
+      { id: 'lavadora', qty: 1 },
+      { id: 'nevera', qty: 1 },
+      { id: 'cajas', qty: 15 }
+    ],
+    expectedServices: ['montaje']
+  },
+  {
+    id: 'familia',
+    icon: '👨‍👩‍👧‍👦',
+    title: 'La familia con niños',
+    difficulty: '⭐⭐⭐',
+    difficultyLabel: 'Uitdagend',
+    shortDesc: 'Gezin met kinderen verhuist compleet huis',
+    casus: `Jullie zijn een gezin met twee kinderen (8 en 12 jaar). Jullie verhuizen van een rijtjeshuis in Eindhoven naar een appartement in Barcelona. Mee gaan: de complete woonkamer (bank, fauteuil, tv-meubel, salontafel, boekenkast), de eetkamer (tafel met zes stoelen, dressoir), de ouderslaapkamer (tweepersoonsbed, twee nachtkastjes, grote kledingkast, ladekast), twee kinderkamers (elk een eenpersoonsbed, bureau, bureaustoel en kledingkast), de keukenapparatuur (koelkast, vriezer, vaatwasser, magnetron), en een tuinset (tafel met vier stoelen en een parasol). Daarnaast zijn er ongeveer 40 verhuisdozen. Het dressoir is antiek en moet extra beschermd worden.`,
+    expectedInventory: [
+      { id: 'sofa_3plazas', qty: 1 },
+      { id: 'sillon', qty: 1 },
+      { id: 'mueble_tv', qty: 1 },
+      { id: 'mesa_centro', qty: 1 },
+      { id: 'estanteria', qty: 1 },
+      { id: 'mesa_comedor', qty: 1 },
+      { id: 'silla', qty: 6 },
+      { id: 'aparador', qty: 1 },
+      { id: 'cama_doble', qty: 1 },
+      { id: 'mesita_noche', qty: 2 },
+      { id: 'armario_grande', qty: 1 },
+      { id: 'comoda', qty: 1 },
+      { id: 'cama_individual', qty: 2 },
+      { id: 'escritorio', qty: 2 },
+      { id: 'silla_escritorio', qty: 2 },
+      { id: 'armario', qty: 2 },
+      { id: 'nevera', qty: 1 },
+      { id: 'congelador', qty: 1 },
+      { id: 'lavavajillas', qty: 1 },
+      { id: 'microondas', qty: 1 },
+      { id: 'mesa_jardin', qty: 1 },
+      { id: 'silla_jardin', qty: 4 },
+      { id: 'sombrilla', qty: 1 },
+      { id: 'cajas', qty: 40 }
+    ],
+    expectedServices: ['embalaje_profesional', 'desmontaje', 'montaje', 'seguro_extra']
+  },
+  {
+    id: 'jubilado',
+    icon: '🏖️',
+    title: 'El jubilado',
+    difficulty: '⭐⭐⭐',
+    difficultyLabel: 'Uitdagend',
+    shortDesc: 'Gepensioneerde verhuist naar de Costa Blanca',
+    casus: `Je bent 68 jaar en met pensioen. Je verkoopt je grote woning in Rotterdam en verhuist naar een kleiner appartement aan de Costa Blanca (Alicante). Je neemt mee: je geliefde vleugelpiano, een antieke vitrinekast met glaswerk, je leren fauteuil, een tweepersoons bed, twee nachtkastjes, een kleine eettafel met twee stoelen, een boekenkast, en 25 verhuisdozen (waarvan 5 met breekbare spullen). De piano en vitrinekast vereisen speciale behandeling.`,
+    expectedInventory: [
+      { id: 'piano', qty: 1 },
+      { id: 'vitrina', qty: 1 },
+      { id: 'sillon_cuero', qty: 1 },
+      { id: 'cama_doble', qty: 1 },
+      { id: 'mesita_noche', qty: 2 },
+      { id: 'mesa_comedor_pequeña', qty: 1 },
+      { id: 'silla', qty: 2 },
+      { id: 'estanteria', qty: 1 },
+      { id: 'cajas', qty: 20 },
+      { id: 'cajas_fragil', qty: 5 }
+    ],
+    expectedServices: ['embalaje_profesional', 'seguro_extra', 'transporte_especial']
+  },
+  {
+    id: 'oficina',
+    icon: '🏢',
+    title: 'La oficina pequeña',
+    difficulty: '⭐⭐',
+    difficultyLabel: 'Gemiddeld',
+    shortDesc: 'Klein bedrijf verhuist kantoor',
+    casus: `Je verhuist je kleine vertaalbureau van een bedrijfspand in Den Haag naar een kantoorruimte in Madrid. Mee gaan: vier bureaus, vier bureaustoelen, twee archiefkasten, een vergadertafel met zes stoelen, een printer, twee computers (goed verpakt), en 10 dozen met dossiers. De computers moeten verzekerd zijn.`,
+    expectedInventory: [
+      { id: 'escritorio', qty: 4 },
+      { id: 'silla_oficina', qty: 4 },
+      { id: 'archivador', qty: 2 },
+      { id: 'mesa_reuniones', qty: 1 },
+      { id: 'silla', qty: 6 },
+      { id: 'impresora', qty: 1 },
+      { id: 'ordenador', qty: 2 },
+      { id: 'cajas', qty: 10 }
+    ],
+    expectedServices: ['seguro_extra']
+  }
+];
+
+// ══════════════════════════════════════════════════════
+//  DATA: INVENTORY ITEMS
+// ══════════════════════════════════════════════════════
+const INVENTORY_ITEMS = [
+  // Dormitorio
+  { id: 'cama_individual', name: 'Cama individual', category: 'dormitorio' },
+  { id: 'cama_doble', name: 'Cama doble', category: 'dormitorio' },
+  { id: 'mesita_noche', name: 'Mesita de noche', category: 'dormitorio' },
+  { id: 'armario', name: 'Armario', category: 'dormitorio' },
+  { id: 'armario_grande', name: 'Armario grande', category: 'dormitorio' },
+  { id: 'comoda', name: 'Cómoda', category: 'dormitorio' },
+  
+  // Salón
+  { id: 'sofa_2plazas', name: 'Sofá de dos plazas', category: 'salon' },
+  { id: 'sofa_3plazas', name: 'Sofá de tres plazas', category: 'salon' },
+  { id: 'sillon', name: 'Sillón', category: 'salon' },
+  { id: 'sillon_cuero', name: 'Sillón de cuero', category: 'salon' },
+  { id: 'mesa_centro', name: 'Mesa de centro', category: 'salon' },
+  { id: 'mueble_tv', name: 'Mueble de televisión', category: 'salon' },
+  { id: 'estanteria', name: 'Estantería', category: 'salon' },
+  { id: 'vitrina', name: 'Vitrina', category: 'salon' },
+  
+  // Comedor
+  { id: 'mesa_comedor', name: 'Mesa de comedor', category: 'comedor' },
+  { id: 'mesa_comedor_pequeña', name: 'Mesa de comedor pequeña', category: 'comedor' },
+  { id: 'silla', name: 'Silla', category: 'comedor' },
+  { id: 'aparador', name: 'Aparador / Dressoir', category: 'comedor' },
+  
+  // Oficina / Estudio
+  { id: 'escritorio', name: 'Escritorio', category: 'oficina' },
+  { id: 'silla_escritorio', name: 'Silla de escritorio', category: 'oficina' },
+  { id: 'silla_oficina', name: 'Silla de oficina', category: 'oficina' },
+  { id: 'archivador', name: 'Archivador', category: 'oficina' },
+  { id: 'mesa_reuniones', name: 'Mesa de reuniones', category: 'oficina' },
+  
+  // Electrodomésticos
+  { id: 'nevera', name: 'Nevera / Frigorífico', category: 'electro' },
+  { id: 'congelador', name: 'Congelador', category: 'electro' },
+  { id: 'lavadora', name: 'Lavadora', category: 'electro' },
+  { id: 'lavavajillas', name: 'Lavavajillas', category: 'electro' },
+  { id: 'microondas', name: 'Microondas', category: 'electro' },
+  { id: 'impresora', name: 'Impresora', category: 'electro' },
+  { id: 'ordenador', name: 'Ordenador', category: 'electro' },
+  
+  // Jardín
+  { id: 'mesa_jardin', name: 'Mesa de jardín', category: 'jardin' },
+  { id: 'silla_jardin', name: 'Silla de jardín', category: 'jardin' },
+  { id: 'sombrilla', name: 'Sombrilla / Parasol', category: 'jardin' },
+  
+  // Especiales
+  { id: 'piano', name: 'Piano de cola', category: 'especial' },
+  { id: 'bicicleta', name: 'Bicicleta', category: 'especial' },
+  
+  // Cajas
+  { id: 'cajas', name: 'Cajas de mudanza', category: 'cajas' },
+  { id: 'cajas_fragil', name: 'Cajas frágil', category: 'cajas' },
+  { id: 'maletas', name: 'Maletas', category: 'cajas' }
+];
+
+// ══════════════════════════════════════════════════════
+//  DATA: SERVICES
+// ══════════════════════════════════════════════════════
+const SERVICES = [
+  { id: 'embalaje_basico', name: 'Embalaje básico', price: 150 },
+  { id: 'embalaje_profesional', name: 'Embalaje profesional', price: 350 },
+  { id: 'desmontaje', name: 'Desmontaje de muebles', price: 120 },
+  { id: 'montaje', name: 'Montaje de muebles', price: 180 },
+  { id: 'seguro_basico', name: 'Seguro básico', price: 80 },
+  { id: 'seguro_extra', name: 'Seguro extra (objetos valiosos)', price: 200 },
+  { id: 'transporte_especial', name: 'Transporte especial (piano/arte)', price: 400 },
+  { id: 'guardamuebles', name: 'Guardamuebles (1 mes)', price: 250 }
+];
+
+// ══════════════════════════════════════════════════════
+//  STATE
+// ══════════════════════════════════════════════════════
+let userName = '';
+let currentScenario = null;
+let currentFormData = null;
+let answerVisible = false;
+
+// ══════════════════════════════════════════════════════
+//  INIT
+// ══════════════════════════════════════════════════════
+window.startApp = function() {
+  const name = document.getElementById('input-name').value.trim();
+  if (!name) {
+    showToast('Voer je naam in');
+    return;
+  }
+  userName = name;
+  document.getElementById('setup-modal').classList.add('hidden');
+  document.getElementById('header-user').textContent = userName;
+  showView('view-scenarios');
+  renderScenarios();
+};
+
+// ══════════════════════════════════════════════════════
+//  VIEW MANAGEMENT
+// ══════════════════════════════════════════════════════
+function showView(viewId) {
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.getElementById(viewId).classList.add('active');
+  
+  // Show/hide sticky casus
+  const stickyCasus = document.getElementById('sticky-casus');
+  if (viewId === 'view-form') {
+    stickyCasus.classList.remove('hidden');
+  } else {
+    stickyCasus.classList.add('hidden');
+  }
+  
+  window.scrollTo(0, 0);
+}
+
+window.backToScenarios = function() {
+  showView('view-scenarios');
+  renderScenarios(); // Re-render to show updated completion status
+};
+
+// ══════════════════════════════════════════════════════
+//  STICKY CASUS
+// ══════════════════════════════════════════════════════
+window.toggleStickyCasus = function() {
+  const el = document.getElementById('sticky-casus');
+  el.classList.toggle('expanded');
+};
+
+// ══════════════════════════════════════════════════════
+//  SCENARIO SELECTION
+// ══════════════════════════════════════════════════════
+function renderScenarios() {
+  const grid = document.getElementById('scenario-grid');
+  const completed = getCompletedScenarios();
+
+  grid.innerHTML = SCENARIOS.map(s => `
+    <div class="scenario-card ${completed.includes(s.id) ? 'completed' : ''}" onclick="selectScenario('${s.id}')">
+      <div class="scenario-header">
+        <span class="scenario-icon">${s.icon}</span>
+        <div>
+          <div class="scenario-title">${s.title}</div>
+          <div class="scenario-difficulty">${s.difficulty} ${s.difficultyLabel}</div>
+        </div>
+      </div>
+      <div class="scenario-desc">${s.shortDesc}</div>
+    </div>
+  `).join('');
+}
+
+window.selectScenario = function(scenarioId) {
+  currentScenario = SCENARIOS.find(s => s.id === scenarioId);
+  if (!currentScenario) return;
+
+  // Update sticky casus
+  document.getElementById('sticky-casus-preview').textContent = currentScenario.casus.substring(0, 80) + '...';
+  document.getElementById('sticky-casus-body').textContent = currentScenario.casus;
+  document.getElementById('sticky-casus').classList.remove('expanded');
+
+  // Render inventory
+  renderInventory();
+
+  // Render services
+  renderServices();
+
+  // Reset form
+  document.getElementById('mudanza-form').reset();
+  document.getElementById('f-nombre').value = userName;
+
+  // Set default date to 2 weeks from now
+  const defaultDate = new Date();
+  defaultDate.setDate(defaultDate.getDate() + 14);
+  document.getElementById('f-fecha').value = defaultDate.toISOString().split('T')[0];
+
+  // Reset answer visibility
+  answerVisible = false;
+  document.getElementById('answer-toggle-btn').textContent = '👁️ Bekijk het juiste antwoord';
+  document.getElementById('answer-container').classList.remove('visible');
+
+  showView('view-form');
+};
+
+// ══════════════════════════════════════════════════════
+//  INVENTORY RENDERING
+// ══════════════════════════════════════════════════════
+function renderInventory() {
+  const grid = document.getElementById('inventory-grid');
+  grid.innerHTML = INVENTORY_ITEMS.map(item => `
+    <div class="inventory-item" id="inv-${item.id}">
+      <span class="item-name">${item.name}</span>
+      <input type="number" class="item-qty" id="qty-${item.id}" 
+             min="0" max="99" value="0" 
+             onchange="updateInventoryStyle('${item.id}')"
+             onfocus="this.select()">
+    </div>
+  `).join('');
+}
+
+window.updateInventoryStyle = function(itemId) {
+  const input = document.getElementById('qty-' + itemId);
+  const container = document.getElementById('inv-' + itemId);
+  const val = parseInt(input.value) || 0;
+  container.classList.toggle('has-qty', val > 0);
+};
+
+// ══════════════════════════════════════════════════════
+//  SERVICES RENDERING
+// ══════════════════════════════════════════════════════
+function renderServices() {
+  const grid = document.getElementById('services-grid');
+  grid.innerHTML = SERVICES.map(s => `
+    <label class="service-item" id="svc-${s.id}" onclick="toggleService('${s.id}')">
+      <input type="checkbox" id="chk-${s.id}" name="services" value="${s.id}">
+      <span class="service-check"></span>
+      <span class="service-label">${s.name}</span>
+    </label>
+  `).join('');
+}
+
+window.toggleService = function(serviceId) {
+  const checkbox = document.getElementById('chk-' + serviceId);
+  const container = document.getElementById('svc-' + serviceId);
+  setTimeout(() => {
+    container.classList.toggle('selected', checkbox.checked);
+  }, 10);
+};
+
+// ══════════════════════════════════════════════════════
+//  FORM SUBMISSION
+// ══════════════════════════════════════════════════════
+window.submitForm = function(e) {
+  e.preventDefault();
+
+  const form = document.getElementById('mudanza-form');
+  const formData = new FormData(form);
+
+  // Gather inventory
+  const inventory = [];
+  INVENTORY_ITEMS.forEach(item => {
+    const qty = parseInt(document.getElementById('qty-' + item.id).value) || 0;
+    if (qty > 0) {
+      inventory.push({ id: item.id, name: item.name, qty });
+    }
+  });
+
+  // Gather services
+  const services = [];
+  SERVICES.forEach(s => {
+    if (document.getElementById('chk-' + s.id).checked) {
+      services.push({ id: s.id, name: s.name, price: s.price });
+    }
+  });
+
+  // Calculate price
+  const basePrice = 500;
+  const distancePrice = 800;
+  const volumePrice = inventory.reduce((sum, item) => sum + item.qty * 25, 0);
+  const servicesPrice = services.reduce((sum, s) => sum + s.price, 0);
+  const totalPrice = basePrice + distancePrice + volumePrice + servicesPrice;
+
+  // Build submission object
+  currentFormData = {
+    scenario: currentScenario.id,
+    scenarioTitle: currentScenario.title,
+    nombre: formData.get('nombre'),
+    telefono: formData.get('telefono'),
+    email: formData.get('email'),
+    origen: formData.get('origen'),
+    destino: formData.get('destino'),
+    tipo_origen: formData.get('tipo_origen'),
+    planta: formData.get('planta'),
+    ascensor: formData.get('ascensor'),
+    fecha: formData.get('fecha'),
+    inventory,
+    services,
+    comentarios: formData.get('comentarios'),
+    pricing: {
+      base: basePrice,
+      distance: distancePrice,
+      volume: volumePrice,
+      services: servicesPrice,
+      total: totalPrice
+    },
+    submittedAt: new Date().toISOString(),
+    submittedBy: userName
+  };
+
+  // Mark scenario as completed
+  markScenarioCompleted(currentScenario.id);
+
+  // Show result
+  renderPresupuesto(currentFormData);
+  renderAnswerComparison(currentFormData);
+  showView('view-result');
+  showToast('¡Presupuesto completado!');
+};
+
+// ══════════════════════════════════════════════════════
+//  PRESUPUESTO RENDERING
+// ══════════════════════════════════════════════════════
+function renderPresupuesto(data) {
+  const refNum = 'MUD-' + Date.now().toString().slice(-6);
+  document.getElementById('ref-number').textContent = refNum;
+
+  const body = document.getElementById('presupuesto-body');
+  
+  const fechaFormatted = new Date(data.fecha).toLocaleDateString('es-ES', {
+    weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'
+  });
+
+  body.innerHTML = `
+    <div class="presupuesto-section">
+      <div class="presupuesto-section-title">Datos del cliente</div>
+      <div class="presupuesto-row"><span class="label">Nombre</span><span class="value">${data.nombre}</span></div>
+      <div class="presupuesto-row"><span class="label">Teléfono</span><span class="value">${data.telefono}</span></div>
+      <div class="presupuesto-row"><span class="label">Email</span><span class="value">${data.email}</span></div>
+    </div>
+
+    <div class="presupuesto-section">
+      <div class="presupuesto-section-title">Detalles de la mudanza</div>
+      <div class="presupuesto-row"><span class="label">Origen</span><span class="value">${data.origen}</span></div>
+      <div class="presupuesto-row"><span class="label">Destino</span><span class="value">${data.destino}</span></div>
+      <div class="presupuesto-row"><span class="label">Tipo de vivienda</span><span class="value">${data.tipo_origen}</span></div>
+      <div class="presupuesto-row"><span class="label">Planta</span><span class="value">${data.planta}</span></div>
+      <div class="presupuesto-row"><span class="label">Ascensor</span><span class="value">${data.ascensor === 'si' ? 'Sí' : 'No'}</span></div>
+      <div class="presupuesto-row"><span class="label">Fecha preferida</span><span class="value">${fechaFormatted}</span></div>
+    </div>
+
+    <div class="presupuesto-section">
+      <div class="presupuesto-section-title">Inventario (${data.inventory.length} artículos)</div>
+      ${data.inventory.map(item => `
+        <div class="presupuesto-row">
+          <span class="label">${item.name}</span>
+          <span class="value">×${item.qty}</span>
+        </div>
+      `).join('')}
+    </div>
+
+    ${data.services.length > 0 ? `
+    <div class="presupuesto-section">
+      <div class="presupuesto-section-title">Servicios adicionales</div>
+      ${data.services.map(s => `
+        <div class="presupuesto-row">
+          <span class="label">${s.name}</span>
+          <span class="value">${s.price}€</span>
+        </div>
+      `).join('')}
+    </div>
+    ` : ''}
+
+    ${data.comentarios ? `
+    <div class="presupuesto-section">
+      <div class="presupuesto-section-title">Comentarios</div>
+      <p style="font-size:0.88rem; color:var(--muted); font-style:italic;">"${data.comentarios}"</p>
+    </div>
+    ` : ''}
+
+    <div class="presupuesto-total">
+      <span class="label">TOTAL ESTIMADO</span>
+      <span class="price">${data.pricing.total.toLocaleString('es-ES')}€</span>
+    </div>
+  `;
+}
+
+// ══════════════════════════════════════════════════════
+//  ANSWER COMPARISON
+// ══════════════════════════════════════════════════════
+function renderAnswerComparison(userData) {
+  const container = document.getElementById('answer-container');
+  
+  // Get expected data
+  const expectedInventory = currentScenario.expectedInventory || [];
+  const expectedServices = currentScenario.expectedServices || [];
+  
+  // Build maps for comparison
+  const userInvMap = {};
+  userData.inventory.forEach(i => { userInvMap[i.id] = i.qty; });
+  
+  const expectedInvMap = {};
+  expectedInventory.forEach(i => { expectedInvMap[i.id] = i.qty; });
+  
+  // Collect all item IDs
+  const allItemIds = new Set([...Object.keys(userInvMap), ...Object.keys(expectedInvMap)]);
+  
+  // Classify items
+  const comparisonItems = [];
+  allItemIds.forEach(id => {
+    const item = INVENTORY_ITEMS.find(i => i.id === id);
+    const userQty = userInvMap[id] || 0;
+    const expectedQty = expectedInvMap[id] || 0;
+    
+    let status = 'match';
+    if (userQty === 0 && expectedQty > 0) status = 'missing';
+    else if (userQty > 0 && expectedQty === 0) status = 'extra';
+    else if (userQty !== expectedQty) status = 'mismatch';
+    
+    comparisonItems.push({
+      id,
+      name: item ? item.name : id,
+      userQty,
+      expectedQty,
+      status
+    });
+  });
+  
+  // Sort: missing first, then mismatches, then matches, then extra
+  const statusOrder = { missing: 0, mismatch: 1, match: 2, extra: 3 };
+  comparisonItems.sort((a, b) => statusOrder[a.status] - statusOrder[b.status]);
+
+  // Services comparison
+  const userServiceIds = userData.services.map(s => s.id);
+  
+  container.innerHTML = `
+    <h3 style="font-family:'Fraunces',serif; font-size:1.1rem; margin-bottom:16px; text-align:center;">
+      Vergelijk je antwoord met het verwachte antwoord
+    </h3>
+    
+    <div class="comparison-grid">
+      <div class="comparison-column">
+        <div class="comparison-header">Jouw inventaris</div>
+        <div class="comparison-body">
+          ${comparisonItems.filter(i => i.userQty > 0).map(i => `
+            <div class="comparison-item ${i.status}">
+              <span class="name">${i.name}</span>
+              <span class="qty">×${i.userQty}</span>
+            </div>
+          `).join('') || '<p style="color:var(--muted); font-size:0.82rem;">Geen items geselecteerd</p>'}
+        </div>
+      </div>
+      
+      <div class="comparison-column correct">
+        <div class="comparison-header">Verwacht antwoord</div>
+        <div class="comparison-body">
+          ${expectedInventory.map(i => {
+            const item = INVENTORY_ITEMS.find(inv => inv.id === i.id);
+            const userQty = userInvMap[i.id] || 0;
+            let status = 'match';
+            if (userQty === 0) status = 'missing';
+            else if (userQty !== i.qty) status = 'mismatch';
+            return `
+              <div class="comparison-item ${status}">
+                <span class="name">${item ? item.name : i.id}</span>
+                <span class="qty">×${i.qty}</span>
+              </div>
+            `;
+          }).join('')}
+        </div>
+      </div>
+    </div>
+    
+    <div class="comparison-legend">
+      <span><span class="legend-dot match"></span> Correct</span>
+      <span><span class="legend-dot missing"></span> Ontbreekt</span>
+      <span><span class="legend-dot extra"></span> Extra</span>
+    </div>
+    
+    <h4 style="font-family:'Fraunces',serif; font-size:0.95rem; margin:24px 0 12px; text-align:center;">
+      Services vergelijking
+    </h4>
+    
+    <div class="comparison-grid">
+      <div class="comparison-column">
+        <div class="comparison-header">Jouw services</div>
+        <div class="comparison-body">
+          ${userData.services.length > 0 
+            ? userData.services.map(s => {
+                const isExpected = expectedServices.includes(s.id);
+                return `<div class="comparison-item ${isExpected ? 'match' : 'extra'}">${s.name}</div>`;
+              }).join('')
+            : '<p style="color:var(--muted); font-size:0.82rem;">Geen services geselecteerd</p>'
+          }
+        </div>
+      </div>
+      
+      <div class="comparison-column correct">
+        <div class="comparison-header">Verwachte services</div>
+        <div class="comparison-body">
+          ${expectedServices.map(sId => {
+            const service = SERVICES.find(s => s.id === sId);
+            const isSelected = userServiceIds.includes(sId);
+            return `<div class="comparison-item ${isSelected ? 'match' : 'missing'}">${service ? service.name : sId}</div>`;
+          }).join('') || '<p style="color:var(--muted); font-size:0.82rem;">Geen services verwacht</p>'}
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+window.toggleAnswer = function() {
+  answerVisible = !answerVisible;
+  const container = document.getElementById('answer-container');
+  const btn = document.getElementById('answer-toggle-btn');
+  
+  if (answerVisible) {
+    container.classList.add('visible');
+    btn.textContent = '🙈 Verberg het antwoord';
+  } else {
+    container.classList.remove('visible');
+    btn.textContent = '👁️ Bekijk het juiste antwoord';
+  }
+};
+
+// ══════════════════════════════════════════════════════
+//  COPY TEXT
+// ══════════════════════════════════════════════════════
+window.copyPresupuesto = function() {
+  const data = currentFormData;
+  const refNum = document.getElementById('ref-number').textContent;
+  
+  const fechaFormatted = new Date(data.fecha).toLocaleDateString('es-ES', {
+    weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'
+  });
+  
+  let text = `PRESUPUESTO DE MUDANZA
+Referencia: ${refNum}
+Escenario: ${currentScenario.title}
+
+DATOS DEL CLIENTE
+Nombre: ${data.nombre}
+Teléfono: ${data.telefono}
+Email: ${data.email}
+
+DETALLES DE LA MUDANZA
+Origen: ${data.origen}
+Destino: ${data.destino}
+Tipo de vivienda: ${data.tipo_origen}
+Planta: ${data.planta}
+Ascensor: ${data.ascensor === 'si' ? 'Sí' : 'No'}
+Fecha preferida: ${fechaFormatted}
+
+INVENTARIO (${data.inventory.length} artículos)
+${data.inventory.map(i => `• ${i.name}: ×${i.qty}`).join('\n')}
+`;
+
+  if (data.services.length > 0) {
+    text += `
+SERVICIOS ADICIONALES
+${data.services.map(s => `• ${s.name}: ${s.price}€`).join('\n')}
+`;
+  }
+
+  if (data.comentarios) {
+    text += `
+COMENTARIOS
+"${data.comentarios}"
+`;
+  }
+
+  text += `
+TOTAL ESTIMADO: ${data.pricing.total.toLocaleString('es-ES')}€
+`;
+
+  navigator.clipboard.writeText(text).then(() => {
+    showToast('Tekst gekopieerd!');
+  }).catch(() => {
+    showToast('Kopiëren mislukt');
+  });
+};
+
+// ══════════════════════════════════════════════════════
+//  PROGRESS TRACKING (localStorage)
+// ══════════════════════════════════════════════════════
+function getCompletedScenarios() {
+  try {
+    const stored = localStorage.getItem('mudanza_completed');
+    return stored ? JSON.parse(stored) : [];
+  } catch {
+    return [];
+  }
+}
+
+function markScenarioCompleted(scenarioId) {
+  const completed = getCompletedScenarios();
+  if (!completed.includes(scenarioId)) {
+    completed.push(scenarioId);
+    localStorage.setItem('mudanza_completed', JSON.stringify(completed));
+  }
+}
+
+// ══════════════════════════════════════════════════════
+//  TOAST
+// ══════════════════════════════════════════════════════
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2500);
+}
+
+</script>
+
+</body>
+</html>
