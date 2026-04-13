@@ -1,0 +1,704 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#1a1208">
+<title>Toets — Español A2+</title>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,300;0,700;1,300&family=Nunito:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:#f5f0e8; --ink:#1a1208; --accent:#c8391a; --gold:#d4a017;
+  --muted:#8a7a62; --card:#fffdf7; --border:#d4c9b0; --green:#2d7a4f;
+  --tab-h:52px; --header-h:58px;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html{height:100%}
+body{background:var(--bg);color:var(--ink);font-family:'Nunito',sans-serif;font-size:16px;line-height:1.6;height:100%;display:flex;flex-direction:column;overflow:hidden}
+
+/* HEADER */
+.app-header{background:var(--ink);color:var(--bg);height:var(--header-h);display:flex;align-items:center;padding:0 16px;gap:10px;flex-shrink:0;z-index:30}
+.app-header h1{font-family:'Fraunces',serif;font-size:1.15rem;font-weight:700;letter-spacing:-.02em;flex:1}
+.save-indicator{font-size:.65rem;color:var(--gold);letter-spacing:.06em;text-transform:uppercase;opacity:0;transition:opacity .3s}
+.save-indicator.visible{opacity:1}
+
+/* TAB BAR */
+.tab-bar{background:var(--card);border-bottom:1.5px solid var(--border);display:flex;height:var(--tab-h);flex-shrink:0;z-index:20;overflow-x:auto;scrollbar-width:none}
+.tab-bar::-webkit-scrollbar{display:none}
+.tab-btn{flex:1;min-width:72px;background:none;border:none;border-bottom:3px solid transparent;font-family:'Nunito',sans-serif;font-size:.75rem;font-weight:700;color:var(--muted);cursor:pointer;padding:0 6px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;transition:color .15s,border-color .15s}
+.tab-btn .tab-icon{font-size:1.05rem}
+.tab-btn .tab-label{font-size:.6rem;letter-spacing:.04em;text-transform:uppercase}
+.tab-btn.active{color:var(--ink);border-bottom-color:var(--accent)}
+
+/* PANELS WRAP */
+.panels-wrap{flex:1;overflow:hidden;position:relative;display:flex;flex-direction:column}
+
+/* STICKY WOORDENBANK */
+.sticky-wb{display:none;background:var(--card);border-bottom:1.5px solid var(--border);padding:10px 14px;flex-shrink:0;z-index:10}
+.sticky-wb.visible{display:block}
+.wb-label{font-size:.65rem;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin-bottom:7px}
+.woordenbank{display:flex;flex-wrap:wrap;gap:6px}
+.woord-chip{background:var(--bg);border:1.5px solid var(--border);border-radius:20px;padding:5px 12px;font-size:.82rem;font-weight:600;color:var(--ink);cursor:pointer;transition:background .12s,opacity .2s;user-select:none}
+.woord-chip.used{opacity:.28;text-decoration:line-through;pointer-events:none}
+.woord-chip:active{background:var(--border)}
+
+/* SCROLL AREA */
+.scroll-area{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch}
+
+/* PANELS */
+.panel{display:none;padding:16px 16px 40px}
+.panel.active{display:block}
+#panel-naam.active{display:flex;flex-direction:column;justify-content:center}
+
+/* NAAM */
+.naam-card{background:var(--card);border:1.5px solid var(--border);border-radius:14px;padding:26px 20px;max-width:440px;margin:0 auto;width:100%}
+.naam-card .logo{font-family:'Fraunces',serif;font-size:1.9rem;font-weight:700;letter-spacing:-.03em;line-height:1.1;margin-bottom:4px}
+.naam-card .logo-sub{font-size:.76rem;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:22px}
+.ctx-box{background:var(--ink);color:var(--bg);border-radius:10px;padding:14px 16px;margin-bottom:22px;font-size:.88rem;line-height:1.65}
+.ctx-box strong{color:var(--gold);display:block;margin-bottom:3px}
+.field-label{font-size:.7rem;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);margin-bottom:6px;display:block}
+.naam-input{width:100%;padding:13px 14px;border:1.5px solid var(--border);border-radius:8px;font-family:'Nunito',sans-serif;font-size:1rem;background:var(--bg);color:var(--ink);outline:none;margin-bottom:14px;-webkit-appearance:none}
+.naam-input:focus{border-color:var(--ink)}
+.start-btn{width:100%;padding:15px;background:var(--accent);color:white;border:none;border-radius:10px;font-family:'Nunito',sans-serif;font-size:1rem;font-weight:700;cursor:pointer}
+.start-btn:disabled{background:var(--border);color:var(--muted);cursor:not-allowed}
+.start-btn:not(:disabled):active{background:#a02d14}
+.naam-locked{display:none;align-items:center;gap:10px;background:var(--bg);border:1.5px solid var(--border);border-radius:8px;padding:12px 14px;margin-bottom:14px;font-weight:700}
+
+/* CARDS */
+.card{background:var(--card);border:1.5px solid var(--border);border-radius:12px;padding:16px 15px;margin-bottom:12px}
+.card-title{font-family:'Fraunces',serif;font-size:1rem;font-weight:700;letter-spacing:-.02em;display:flex;align-items:center;gap:8px;margin-bottom:4px}
+.badge{font-size:.6rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;padding:2px 8px;border-radius:20px;background:var(--accent);color:white}
+.badge.gold{background:var(--gold);color:var(--ink)}
+.badge.ink{background:var(--ink);color:var(--bg)}
+.punten-tag{margin-left:auto;font-size:.72rem;color:var(--muted);font-weight:600}
+.instr{font-size:.84rem;color:var(--muted);font-style:italic;margin-bottom:12px;line-height:1.5;margin-top:6px}
+
+/* SITUATIE */
+.sit-box{background:var(--ink);color:var(--bg);border-radius:10px;padding:14px 16px;margin-bottom:12px;font-size:.88rem;line-height:1.65}
+.sit-box strong{color:var(--gold);display:block;margin-bottom:6px;font-family:'Fraunces',serif}
+.sit-box em{color:#f5c842;font-style:normal;font-weight:600}
+
+/* FILL */
+.fill-item{margin-bottom:13px;padding-bottom:13px;border-bottom:1px solid var(--border)}
+.fill-item:last-child{border-bottom:none;margin-bottom:0;padding-bottom:0}
+.fill-nr{font-size:.7rem;font-weight:700;color:var(--accent);text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px}
+.fill-zin{font-size:.93rem;line-height:1.55;margin-bottom:7px}
+.fill-zin .gap{color:var(--muted);font-style:italic}
+.fill-answer{width:100%;padding:11px 12px;border:1.5px solid var(--border);border-radius:8px;font-family:'Nunito',sans-serif;font-size:.95rem;background:var(--bg);color:var(--ink);outline:none;-webkit-appearance:none}
+.fill-answer:focus{border-color:var(--ink)}
+
+/* MC */
+.mc-item{margin-bottom:18px;padding-bottom:18px;border-bottom:1px solid var(--border)}
+.mc-item:last-child{border-bottom:none;margin-bottom:0;padding-bottom:0}
+.mc-vraag{font-size:.93rem;line-height:1.5;margin-bottom:10px;font-weight:600}
+.mc-nr{color:var(--accent);margin-right:4px}
+.mc-voetnoot{font-size:.76rem;color:var(--muted);font-style:italic;margin:-4px 0 8px}
+.mc-options{display:flex;flex-direction:column;gap:8px}
+.mc-option{display:flex;align-items:flex-start;gap:12px;padding:12px 13px;border:1.5px solid var(--border);border-radius:10px;background:var(--bg);cursor:pointer;font-size:.9rem;line-height:1.45;transition:border-color .12s,background .12s}
+.mc-option.selected{border-color:var(--accent);background:#fff0ed}
+.mc-option:active{background:var(--border)}
+.mc-radio{width:20px;height:20px;border-radius:50%;border:2px solid var(--border);flex-shrink:0;margin-top:1px;display:flex;align-items:center;justify-content:center;transition:border-color .12s,background .12s}
+.mc-option.selected .mc-radio{border-color:var(--accent);background:var(--accent)}
+.mc-option.selected .mc-radio::after{content:'';width:8px;height:8px;border-radius:50%;background:white;display:block}
+
+/* SCHRIJFVAK */
+.checklist{list-style:none;margin-bottom:12px}
+.checklist li{display:flex;align-items:flex-start;gap:9px;padding:8px 0;border-bottom:1px solid var(--border);font-size:.86rem;line-height:1.45}
+.checklist li:last-child{border-bottom:none}
+.chk-box{width:18px;height:18px;border:1.5px solid var(--border);border-radius:4px;flex-shrink:0;margin-top:1px;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:.75rem;transition:background .12s,border-color .12s}
+.chk-box.checked{background:var(--green);border-color:var(--green);color:white}
+.thema-tag{margin-left:auto;font-size:.62rem;background:var(--bg);border:1px solid var(--border);border-radius:4px;padding:2px 6px;color:var(--muted);white-space:nowrap;align-self:center;flex-shrink:0}
+.schrijfvak{width:100%;min-height:190px;border:1.5px solid var(--border);border-radius:10px;padding:13px;font-family:'Nunito',sans-serif;font-size:.93rem;background:var(--bg);color:var(--ink);resize:vertical;outline:none;line-height:1.7;-webkit-appearance:none}
+.schrijfvak:focus{border-color:var(--ink)}
+.wordcount{text-align:right;font-size:.72rem;color:var(--muted);margin-top:5px}
+.wordcount.ok{color:var(--green);font-weight:700}
+.wordcount.over{color:var(--accent);font-weight:700}
+
+/* INLEVEREN */
+.progress-item{display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid var(--border);font-size:.88rem}
+.progress-item:last-child{border-bottom:none}
+.progress-dot{width:10px;height:10px;border-radius:50%;background:var(--border);flex-shrink:0}
+.progress-dot.done{background:var(--green)}
+.progress-dot.partial{background:var(--gold)}
+.inlever-btn{width:100%;padding:16px;background:var(--ink);color:var(--bg);border:none;border-radius:10px;font-family:'Nunito',sans-serif;font-size:1rem;font-weight:700;cursor:pointer;letter-spacing:.02em;margin-bottom:8px}
+.inlever-btn:active{background:var(--accent)}
+
+/* OVERZICHT */
+.overzicht-screen{display:none;padding:16px 16px 40px}
+.overzicht-screen.show{display:block}
+.overzicht-box{background:var(--card);border:1.5px solid var(--border);border-radius:12px;padding:16px 15px;margin-bottom:12px}
+.overzicht-box h2{font-family:'Fraunces',serif;font-size:1.1rem;font-weight:700;letter-spacing:-.02em;margin-bottom:12px}
+.antwoord-blok{background:var(--bg);border:1.5px solid var(--border);border-radius:8px;padding:13px 14px;font-size:.82rem;line-height:1.8;white-space:pre-wrap;word-break:break-word;margin-bottom:12px;font-family:'Nunito',sans-serif}
+.kopieer-btn{width:100%;padding:15px;background:var(--accent);color:white;border:none;border-radius:10px;font-family:'Nunito',sans-serif;font-size:1rem;font-weight:700;cursor:pointer;letter-spacing:.02em}
+.kopieer-btn:active{background:#a02d14}
+.kopieer-btn.copied{background:var(--green)}
+.inlever-tip{font-size:.8rem;color:var(--muted);text-align:center;margin-top:10px;line-height:1.5}
+
+/* NAV */
+.nav-bar{display:flex;gap:10px;margin-top:4px}
+.nav-btn{flex:1;padding:14px;border-radius:10px;border:1.5px solid var(--border);background:var(--card);font-family:'Nunito',sans-serif;font-size:.88rem;font-weight:700;color:var(--ink);cursor:pointer}
+.nav-btn.primary{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.nav-btn:active{opacity:.75}
+</style>
+</head>
+<body>
+
+<header class="app-header">
+  <h1>Toets — Español A2+</h1>
+  <span class="save-indicator" id="save-indicator">Opgeslagen</span>
+</header>
+
+<nav class="tab-bar">
+  <button class="tab-btn active" data-tab="naam" onclick="goTab('naam')">
+    <span class="tab-icon">👤</span><span class="tab-label">Naam</span>
+  </button>
+  <button class="tab-btn" data-tab="situatie" onclick="goTab('situatie')">
+    <span class="tab-icon">📋</span><span class="tab-label">Situatie</span>
+  </button>
+  <button class="tab-btn" data-tab="deel1" onclick="goTab('deel1')">
+    <span class="tab-icon">✏️</span><span class="tab-label">Deel 1</span>
+  </button>
+  <button class="tab-btn" data-tab="deel2" onclick="goTab('deel2')">
+    <span class="tab-icon">☑️</span><span class="tab-label">Deel 2</span>
+  </button>
+  <button class="tab-btn" data-tab="deel3" onclick="goTab('deel3')">
+    <span class="tab-icon">✉️</span><span class="tab-label">Deel 3</span>
+  </button>
+  <button class="tab-btn" data-tab="inleveren" onclick="goTab('inleveren')">
+    <span class="tab-icon">📤</span><span class="tab-label">Inleveren</span>
+  </button>
+</nav>
+
+<div class="panels-wrap">
+
+  <!-- STICKY WOORDENBANK -->
+  <div class="sticky-wb" id="sticky-wb">
+    <div class="wb-label">Woordenbank — elk woord één keer</div>
+    <div class="woordenbank" id="woordenbank">
+      <span class="woord-chip" data-woord="retrasado">retrasado</span>
+      <span class="woord-chip" data-woord="embarcar">embarcar</span>
+      <span class="woord-chip" data-woord="la salida">la salida</span>
+      <span class="woord-chip" data-woord="la maleta">la maleta</span>
+      <span class="woord-chip" data-woord="el vuelo">el vuelo</span>
+      <span class="woord-chip" data-woord="hacer cola">hacer cola</span>
+      <span class="woord-chip" data-woord="mudarse">mudarse</span>
+      <span class="woord-chip" data-woord="las cajas">las cajas</span>
+      <span class="woord-chip" data-woord="acostumbrarse">acostumbrarse</span>
+      <span class="woord-chip" data-woord="instalarse">instalarse</span>
+      <span class="woord-chip" data-woord="sentirse">sentirse</span>
+      <span class="woord-chip" data-woord="lo siento mucho">lo siento mucho</span>
+    </div>
+  </div>
+
+  <div class="scroll-area" id="scroll-area">
+
+    <!-- OVERZICHT NA INLEVEREN -->
+    <div class="overzicht-screen" id="overzicht-screen">
+      <div class="overzicht-box">
+        <div style="font-size:2rem;margin-bottom:10px">✅</div>
+        <h2>Ingeleverd!</h2>
+        <p style="font-size:.88rem;color:var(--muted);margin-bottom:16px;line-height:1.55">
+          Hieronder staan al je antwoorden. Kopieer de tekst en plak die in Google Classroom.
+        </p>
+        <div class="antwoord-blok" id="antwoord-blok"></div>
+        <button class="kopieer-btn" id="kopieer-btn" onclick="kopieerAntwoorden()">📋 Kopieer antwoorden</button>
+        <div class="inlever-tip">Ga naar Google Classroom → open de opdracht → plak je antwoorden in het tekstvak.</div>
+      </div>
+    </div>
+
+    <!-- NAAM -->
+    <div class="panel active" id="panel-naam">
+      <div class="naam-card">
+        <div class="logo">Toetsopdracht</div>
+        <div class="logo-sub">Español A2+ · Combinatie</div>
+        <div class="ctx-box">
+          <strong>Thema's</strong>
+          Vliegtuigvertraging · Verhuizen · Excuses aanbieden
+          <br><br>
+          <strong>Let op</strong>
+          Je kunt de toets maar één keer starten. Je antwoorden worden automatisch opgeslagen.
+        </div>
+        <label class="field-label" for="naam-input">Jouw naam</label>
+        <div class="naam-locked" id="naam-locked">
+          <span>🔒</span><span id="naam-display"></span>
+        </div>
+        <input class="naam-input" id="naam-input" type="text"
+          placeholder="Voer je naam in…"
+          autocomplete="name" autocorrect="off" autocapitalize="words"
+          oninput="checkNaam()">
+        <button class="start-btn" id="start-btn" disabled onclick="startToets()">
+          Start de toets →
+        </button>
+      </div>
+    </div>
+
+    <!-- SITUATIE -->
+    <div class="panel" id="panel-situatie">
+      <div class="sit-box">
+        <strong>📋 De situatie — lees dit goed door</strong>
+        Je heet <em>Rodrigo</em> en je woont in Valencia. Vorige maand ben je van Amsterdam naar Valencia verhuisd.
+        Je hebt al je spullen ingepakt en de verhuisdienst betaald — maar daarna ging het mis.
+        Je vlucht vanuit Amsterdam had <em>drie uur vertraging</em>.
+        Daardoor ben je te laat gearriveerd voor de sleuteloverdracht van je nieuwe appartement.
+        Je buurvrouw <em>Carmen</em> had op je gewacht, maar was al weg.<br><br>
+        Je stuurt Carmen nu een <em>e-mail</em> om je te verontschuldigen, de situatie uit te leggen en een nieuwe afspraak te maken.
+      </div>
+      <div class="card">
+        <div class="card-title">Over de toets</div>
+        <div style="font-size:.88rem;line-height:1.75;margin-top:8px">
+          <strong>Deel 1</strong> — Zinnen aanvullen (12 pt)<br>
+          <strong>Deel 2</strong> — Meerkeuzevragen (8 pt)<br>
+          <strong>Deel 3</strong> — E-mail schrijven (20 pt)<br><br>
+          <span style="color:var(--muted)">Totaal: 40 punten · Voldoende: 20/40</span>
+        </div>
+      </div>
+      <div class="nav-bar">
+        <button class="nav-btn primary" onclick="goTab('deel1')">Naar Deel 1 →</button>
+      </div>
+    </div>
+
+    <!-- DEEL 1 -->
+    <div class="panel" id="panel-deel1">
+      <div class="card">
+        <div class="card-title">
+          <span class="badge">Deel 1</span> Zinnen aanvullen
+          <span class="punten-tag">12 pt</span>
+        </div>
+        <div class="instr">Vul het juiste woord in. Tik op een woord uit de woordenbank bovenaan om het in te vullen, of typ zelf.</div>
+      </div>
+      <div class="card">
+        <div class="fill-item">
+          <div class="fill-nr">Zin 1</div>
+          <div class="fill-zin">El avión estaba <span class="gap">___</span> — llegó con tres horas de retraso.</div>
+          <input class="fill-answer" data-q="f1" type="text" placeholder="jouw antwoord…" autocorrect="off" autocapitalize="none">
+        </div>
+        <div class="fill-item">
+          <div class="fill-nr">Zin 2</div>
+          <div class="fill-zin">Los pasajeros tuvieron que esperar dos horas antes de poder <span class="gap">___</span>.</div>
+          <input class="fill-answer" data-q="f2" type="text" placeholder="jouw antwoord…" autocorrect="off" autocapitalize="none">
+        </div>
+        <div class="fill-item">
+          <div class="fill-nr">Zin 3</div>
+          <div class="fill-zin"><span class="gap">___</span> estaba prevista a las 14:00, pero al final salimos a las 17:15.</div>
+          <input class="fill-answer" data-q="f3" type="text" placeholder="jouw antwoord…" autocorrect="off" autocapitalize="none">
+        </div>
+        <div class="fill-item">
+          <div class="fill-nr">Zin 4</div>
+          <div class="fill-zin">Perdí <span class="gap">___</span> en el aeropuerto — tardaron dos horas en encontrarla.</div>
+          <input class="fill-answer" data-q="f4" type="text" placeholder="jouw antwoord…" autocorrect="off" autocapitalize="none">
+        </div>
+        <div class="fill-item">
+          <div class="fill-nr">Zin 5</div>
+          <div class="fill-zin">Decidí <span class="gap">___</span> a Valencia porque quería empezar una nueva vida.</div>
+          <input class="fill-answer" data-q="f5" type="text" placeholder="jouw antwoord…" autocorrect="off" autocapitalize="none">
+        </div>
+        <div class="fill-item">
+          <div class="fill-nr">Zin 6</div>
+          <div class="fill-zin">Todavía tengo muchas <span class="gap">___</span> sin abrir en el salón.</div>
+          <input class="fill-answer" data-q="f6" type="text" placeholder="jouw antwoord…" autocorrect="off" autocapitalize="none">
+        </div>
+        <div class="fill-item">
+          <div class="fill-nr">Zin 7</div>
+          <div class="fill-zin">Voy a necesitar tiempo para <span class="gap">___</span> al nuevo barrio.</div>
+          <input class="fill-answer" data-q="f7" type="text" placeholder="jouw antwoord…" autocorrect="off" autocapitalize="none">
+        </div>
+        <div class="fill-item">
+          <div class="fill-nr">Zin 8</div>
+          <div class="fill-zin">Ya empiezo a <span class="gap">___</span> más cómodo en mi nuevo apartamento.</div>
+          <input class="fill-answer" data-q="f8" type="text" placeholder="jouw antwoord…" autocorrect="off" autocapitalize="none">
+        </div>
+        <div class="fill-item">
+          <div class="fill-nr">Zin 9</div>
+          <div class="fill-zin">Primero tengo que <span class="gap">___</span> bien antes de invitar a los vecinos.</div>
+          <input class="fill-answer" data-q="f9" type="text" placeholder="jouw antwoord…" autocorrect="off" autocapitalize="none">
+        </div>
+        <div class="fill-item">
+          <div class="fill-nr">Zin 10</div>
+          <div class="fill-zin">Carmen, <span class="gap">___</span> por no haber llegado a tiempo el martes.</div>
+          <input class="fill-answer" data-q="f10" type="text" placeholder="jouw antwoord…" autocorrect="off" autocapitalize="none">
+        </div>
+        <div class="fill-item">
+          <div class="fill-nr">Zin 11</div>
+          <div class="fill-zin">Tuve que <span class="gap">___</span> una hora en el aeropuerto para la facturación.</div>
+          <input class="fill-answer" data-q="f11" type="text" placeholder="jouw antwoord…" autocorrect="off" autocapitalize="none">
+        </div>
+        <div class="fill-item">
+          <div class="fill-nr">Zin 12</div>
+          <div class="fill-zin"><span class="gap">___</span> un poco solo al principio, pero ahora ya estoy mejor.</div>
+          <input class="fill-answer" data-q="f12" type="text" placeholder="jouw antwoord…" autocorrect="off" autocapitalize="none">
+        </div>
+      </div>
+      <div class="nav-bar">
+        <button class="nav-btn" onclick="goTab('situatie')">← Situatie</button>
+        <button class="nav-btn primary" onclick="goTab('deel2')">Naar Deel 2 →</button>
+      </div>
+    </div>
+
+    <!-- DEEL 2 -->
+    <div class="panel" id="panel-deel2">
+      <div class="card">
+        <div class="card-title">
+          <span class="badge gold">Deel 2</span> Meerkeuzevragen
+          <span class="punten-tag">8 pt</span>
+        </div>
+        <div class="instr">Kies de juiste optie. Tik op je antwoord.</div>
+      </div>
+      <div class="card">
+
+        <div class="mc-item">
+          <div class="mc-vraag"><span class="mc-nr">1.</span> Rodrigo stuurt Carmen een berichtje. Hoe begint hij zijn excuses?</div>
+          <div class="mc-options" data-q="mc1">
+            <div class="mc-option" onclick="selectMC('mc1','a',this)">
+              <span class="mc-radio"></span>
+              <span>a. "Perdona, Carmen. No llegué a tiempo porque el vuelo tenía retraso."</span>
+            </div>
+            <div class="mc-option" onclick="selectMC('mc1','b',this)">
+              <span class="mc-radio"></span>
+              <span>b. "Perdona a Carmen. No llegué a tiempo porque el vuelo tenía retraso."</span>
+            </div>
+            <div class="mc-option" onclick="selectMC('mc1','c',this)">
+              <span class="mc-radio"></span>
+              <span>c. "Perdona, Carmen. No llegué a tiempo porque el vuelo tuvo retraso."</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="mc-item">
+          <div class="mc-vraag"><span class="mc-nr">2.</span> Rodrigo wil zeggen dat hij drie uur moest wachten op het vliegveld. Welke zin is correct?</div>
+          <div class="mc-options" data-q="mc2">
+            <div class="mc-option" onclick="selectMC('mc2','a',this)">
+              <span class="mc-radio"></span>
+              <span>a. "Tuve que esperar por tres horas en el aeropuerto."</span>
+            </div>
+            <div class="mc-option" onclick="selectMC('mc2','b',this)">
+              <span class="mc-radio"></span>
+              <span>b. "Tuve que esperé tres horas en el aeropuerto."</span>
+            </div>
+            <div class="mc-option" onclick="selectMC('mc2','c',this)">
+              <span class="mc-radio"></span>
+              <span>c. "Tuve que esperar tres horas en el aeropuerto."</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="mc-item">
+          <div class="mc-vraag"><span class="mc-nr">3.</span> Carmen antwoordt vriendelijk. Rodrigo reageert. Wat zegt hij?</div>
+          <div class="mc-options" data-q="mc3">
+            <div class="mc-option" onclick="selectMC('mc3','a',this)">
+              <span class="mc-radio"></span>
+              <span>a. "Me alegro. ¡Hasta pronto!"</span>
+            </div>
+            <div class="mc-option" onclick="selectMC('mc3','b',this)">
+              <span class="mc-radio"></span>
+              <span>b. "Muchas gracias. Eres muy amable, Carmen."</span>
+            </div>
+            <div class="mc-option" onclick="selectMC('mc3','c',this)">
+              <span class="mc-radio"></span>
+              <span>c. "Gracias, pero no es necesario."</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="mc-item">
+          <div class="mc-vraag"><span class="mc-nr">4.</span> Rodrigo wil een nieuwe afspraak voorstellen voor donderdag. Welke zin is correct?</div>
+          <div class="mc-options" data-q="mc4">
+            <div class="mc-option" onclick="selectMC('mc4','a',this)">
+              <span class="mc-radio"></span>
+              <span>a. "¿Podemos quedar en el jueves?"</span>
+            </div>
+            <div class="mc-option" onclick="selectMC('mc4','b',this)">
+              <span class="mc-radio"></span>
+              <span>b. "¿Podemos quedar a el jueves?"</span>
+            </div>
+            <div class="mc-option" onclick="selectMC('mc4','c',this)">
+              <span class="mc-radio"></span>
+              <span>c. "¿Podemos quedar el jueves?"</span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+      <div class="nav-bar">
+        <button class="nav-btn" onclick="goTab('deel1')">← Deel 1</button>
+        <button class="nav-btn primary" onclick="goTab('deel3')">Naar Deel 3 →</button>
+      </div>
+    </div>
+
+    <!-- DEEL 3 -->
+    <div class="panel" id="panel-deel3">
+      <div class="sit-box" style="font-size:.84rem">
+        <strong>📋 Situatie (samenvatting)</strong>
+        Je bent Rodrigo. Je vlucht van Amsterdam naar Valencia had drie uur vertraging.
+        Daardoor miste je de sleuteloverdracht bij buurvrouw Carmen. Schrijf haar een e-mail.
+      </div>
+      <div class="card">
+        <div class="card-title">
+          <span class="badge ink">Deel 3</span> E-mail schrijven
+          <span class="punten-tag">20 pt</span>
+        </div>
+        <div class="instr">Schrijf de e-mail van Rodrigo aan Carmen (60–110 woorden).</div>
+        <p style="font-size:.85rem;font-weight:700;margin-bottom:10px">Je e-mail bevat minstens:</p>
+        <ul class="checklist">
+          <li>
+            <span class="chk-box" onclick="toggleChk(this)"></span>
+            <span>Een passende aanhef en afsluiting</span>
+            <span class="thema-tag">Excuses</span>
+          </li>
+          <li>
+            <span class="chk-box" onclick="toggleChk(this)"></span>
+            <span>Verontschuldiging (<em>lo siento, disculpa, perdona</em>…)</span>
+            <span class="thema-tag">Excuses</span>
+          </li>
+          <li>
+            <span class="chk-box" onclick="toggleChk(this)"></span>
+            <span>Uitleg over de vertraging (min. 2 woorden uit vliegtuig-lijst)</span>
+            <span class="thema-tag">Vliegtuig</span>
+          </li>
+          <li>
+            <span class="chk-box" onclick="toggleChk(this)"></span>
+            <span>Vermelding van de verhuissituatie (min. 2 woorden uit verhuizen-lijst)</span>
+            <span class="thema-tag">Verhuizen</span>
+          </li>
+          <li>
+            <span class="chk-box" onclick="toggleChk(this)"></span>
+            <span>Voorstel voor een nieuwe afspraak</span>
+            <span class="thema-tag">Vrij</span>
+          </li>
+        </ul>
+        <textarea class="schrijfvak" id="email-tekst"
+          placeholder="Hola Carmen,&#10;&#10;…&#10;&#10;Un saludo,&#10;Rodrigo"
+          oninput="updateWordCount();state.email=this.value;debouncedSave()"></textarea>
+        <div class="wordcount" id="wordcount">0 woorden (doel: 60–110)</div>
+      </div>
+      <div class="nav-bar">
+        <button class="nav-btn" onclick="goTab('deel2')">← Deel 2</button>
+        <button class="nav-btn primary" onclick="goTab('inleveren')">Inleveren →</button>
+      </div>
+    </div>
+
+    <!-- INLEVEREN -->
+    <div class="panel" id="panel-inleveren">
+      <div class="card">
+        <div class="card-title">📤 Inleveren</div>
+        <div class="instr">Controleer je antwoorden vóór je inlevert. Na het inleveren kun je niets meer wijzigen.</div>
+      </div>
+      <div class="card">
+        <div class="progress-item">
+          <span class="progress-dot" id="dot-deel1"></span>
+          <span>Deel 1 — Zinnen aanvullen</span>
+          <span style="margin-left:auto;font-size:.78rem;color:var(--muted)" id="prog-deel1-label"></span>
+        </div>
+        <div class="progress-item">
+          <span class="progress-dot" id="dot-deel2"></span>
+          <span>Deel 2 — Meerkeuze</span>
+          <span style="margin-left:auto;font-size:.78rem;color:var(--muted)" id="prog-deel2-label"></span>
+        </div>
+        <div class="progress-item">
+          <span class="progress-dot" id="dot-deel3"></span>
+          <span>Deel 3 — E-mail</span>
+          <span style="margin-left:auto;font-size:.78rem;color:var(--muted)" id="prog-deel3-label"></span>
+        </div>
+      </div>
+      <div class="card" style="text-align:center">
+        <p style="font-size:.86rem;color:var(--muted);margin-bottom:14px;line-height:1.5">
+          Door in te leveren bevestig je dat dit je eigen werk is.
+        </p>
+        <button class="inlever-btn" onclick="inleveren()">✓ Definitief inleveren</button>
+        <div style="font-size:.74rem;color:var(--muted)">Na het inleveren zie je een overzicht om te kopiëren naar Google Classroom.</div>
+      </div>
+      <div class="nav-bar">
+        <button class="nav-btn" onclick="goTab('deel3')">← Deel 3</button>
+      </div>
+    </div>
+
+  </div><!-- /scroll-area -->
+</div><!-- /panels-wrap -->
+
+<script>
+const STORAGE_KEY = 'toets_a2_v2';
+let state = {naam:'',started:false,submitted:false,fill:{},mc:{},email:'',checklists:[]};
+
+function loadState(){try{const s=localStorage.getItem(STORAGE_KEY);if(s)state=Object.assign(state,JSON.parse(s))}catch(e){}}
+function saveState(){try{localStorage.setItem(STORAGE_KEY,JSON.stringify(state));flashSave()}catch(e){}}
+let saveTimer;
+function debouncedSave(){clearTimeout(saveTimer);saveTimer=setTimeout(saveState,600)}
+function flashSave(){const el=document.getElementById('save-indicator');el.classList.add('visible');setTimeout(()=>el.classList.remove('visible'),1500)}
+
+function checkNaam(){document.getElementById('start-btn').disabled=document.getElementById('naam-input').value.trim().length<2}
+
+function startToets(){
+  const v=document.getElementById('naam-input').value.trim();
+  if(v.length<2)return;
+  state.naam=v;state.started=true;saveState();lockNaam();setTabsLocked(false);goTab('situatie');
+}
+
+function lockNaam(){
+  document.getElementById('naam-input').style.display='none';
+  document.getElementById('start-btn').style.display='none';
+  const l=document.getElementById('naam-locked');l.style.display='flex';
+  document.getElementById('naam-display').textContent=state.naam;
+}
+
+function setTabsLocked(locked){
+  document.querySelectorAll('.tab-btn:not([data-tab="naam"])').forEach(b=>{
+    b.style.opacity=locked?'0.35':'';b.style.pointerEvents=locked?'none':'';
+  });
+}
+
+function goTab(id){
+  if(!state.started&&id!=='naam')return;
+  if(state.submitted)return;
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+  document.getElementById('panel-'+id).classList.add('active');
+  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.toggle('active',b.dataset.tab===id));
+  document.getElementById('scroll-area').scrollTop=0;
+  document.getElementById('sticky-wb').classList.toggle('visible',id==='deel1');
+  if(id==='inleveren')updateProgress();
+}
+
+let activeInput=null;
+document.querySelectorAll('.fill-answer').forEach(input=>{
+  input.addEventListener('focus',()=>activeInput=input);
+  input.addEventListener('input',()=>{state.fill[input.dataset.q]=input.value;debouncedSave();syncWordbank()});
+});
+document.querySelectorAll('.woord-chip').forEach(chip=>{
+  chip.addEventListener('click',()=>{
+    if(!activeInput){activeInput=document.querySelector('.fill-answer:not([disabled])');if(!activeInput)return}
+    activeInput.value=chip.dataset.woord;activeInput.dispatchEvent(new Event('input'));
+    const all=Array.from(document.querySelectorAll('.fill-answer'));
+    const next=all.slice(all.indexOf(activeInput)+1).find(i=>!i.value);
+    if(next){next.focus();activeInput=next}else{activeInput.blur();activeInput=null}
+  });
+});
+function syncWordbank(){
+  const used=new Set(Object.values(state.fill).filter(Boolean).map(v=>v.trim().toLowerCase()));
+  document.querySelectorAll('.woord-chip').forEach(c=>c.classList.toggle('used',used.has(c.dataset.woord.toLowerCase())));
+}
+
+function selectMC(q,val,el){
+  el.closest('.mc-options').querySelectorAll('.mc-option').forEach(o=>o.classList.remove('selected'));
+  el.classList.add('selected');state.mc[q]=val;debouncedSave();
+}
+
+function updateWordCount(){
+  const txt=document.getElementById('email-tekst').value.trim();
+  const w=txt?txt.split(/\s+/).length:0;
+  const el=document.getElementById('wordcount');
+  el.textContent=w+' woorden (doel: 60–110)';
+  el.className='wordcount'+(w>=60&&w<=110?' ok':w>110?' over':'');
+}
+
+function toggleChk(el){
+  el.classList.toggle('checked');el.textContent=el.classList.contains('checked')?'✓':'';
+  state.checklists=Array.from(document.querySelectorAll('.chk-box')).map(b=>b.classList.contains('checked'));
+  debouncedSave();
+}
+
+function updateProgress(){
+  const d1=Object.values(state.fill).filter(Boolean).length;
+  const d2=Object.keys(state.mc).length;
+  const wc=(state.email||'').trim()?(state.email.trim().split(/\s+/).length):0;
+  const dot=(id,ok,partial)=>{document.getElementById('dot-'+id).className='progress-dot'+(ok?' done':partial?' partial':'')};
+  dot('deel1',d1===12,d1>0);document.getElementById('prog-deel1-label').textContent=d1+'/12 ingevuld';
+  dot('deel2',d2===4,d2>0);document.getElementById('prog-deel2-label').textContent=d2+'/4 beantwoord';
+  dot('deel3',wc>60,wc>0);document.getElementById('prog-deel3-label').textContent=wc+' woorden';
+}
+
+function inleveren(){
+  state.submitted=true;saveState();
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b=>{b.style.pointerEvents='none';b.style.opacity='0.4'});
+  document.getElementById('sticky-wb').classList.remove('visible');
+
+  const datum=new Date().toLocaleDateString('nl-NL',{day:'numeric',month:'long',year:'numeric'});
+  const tijd=new Date().toLocaleTimeString('nl-NL',{hour:'2-digit',minute:'2-digit'});
+
+  const zinnen=[
+    'El avión estaba ___ — llegó con tres horas de retraso.',
+    'Los pasajeros tuvieron que esperar dos horas antes de poder ___.',
+    '___ estaba prevista a las 14:00, pero al final salimos a las 17:15.',
+    'Perdí ___ en el aeropuerto — tardaron dos horas en encontrarla.',
+    'Decidí ___ a Valencia porque quería empezar una nueva vida.',
+    'Todavía tengo muchas ___ sin abrir en el salón.',
+    'Voy a necesitar tiempo para ___ al nuevo barrio.',
+    'Ya empiezo a ___ más cómodo en mi nuevo apartamento.',
+    'Primero tengo que ___ bien antes de invitar a los vecinos.',
+    'Carmen, ___ por no haber llegado a tiempo el martes.',
+    'Tuve que ___ una hora en el aeropuerto para la facturación.',
+    '___ un poco solo al principio, pero ahora ya estoy mejor.'
+  ];
+
+  const mcTekst={
+    mc1:{a:'a. "Perdona, Carmen. No llegué a tiempo porque el vuelo tenía retraso."',
+         b:'b. "Perdona a Carmen. No llegué a tiempo porque el vuelo tenía retraso."',
+         c:'c. "Perdona, Carmen. No llegué a tiempo porque el vuelo tuvo retraso."'},
+    mc2:{a:'a. "Tuve que esperar por tres horas en el aeropuerto."',
+         b:'b. "Tuve que esperé tres horas en el aeropuerto."',
+         c:'c. "Tuve que esperar tres horas en el aeropuerto."'},
+    mc3:{a:'a. "Me alegro. ¡Hasta pronto!"',
+         b:'b. "Muchas gracias. Eres muy amable, Carmen."',
+         c:'c. "Gracias, pero no es necesario."'},
+    mc4:{a:'a. "¿Podemos quedar en el jueves?"',
+         b:'b. "¿Podemos quedar a el jueves?"',
+         c:'c. "¿Podemos quedar el jueves?"'}
+  };
+
+  let t=`TOETS — ESPAÑOL A2+\nNaam: ${state.naam}\nDatum: ${datum} om ${tijd}\n${'─'.repeat(36)}\n\n`;
+  t+=`DEEL 1 — ZINNEN AANVULLEN\n\n`;
+  for(let i=1;i<=12;i++){
+    const a=(state.fill['f'+i]||'').trim()||'—';
+    t+=`${i}. ${zinnen[i-1].replace('___','['+a+']')}\n`;
+  }
+  t+=`\n${'─'.repeat(36)}\n\nDEEL 2 — MEERKEUZE\n\n`;
+  ['mc1','mc2','mc3','mc4'].forEach((q,i)=>{
+    const g=state.mc[q];
+    t+=`${i+1}. ${g?mcTekst[q][g]:'(geen antwoord)'}\n`;
+  });
+  t+=`\n${'─'.repeat(36)}\n\nDEEL 3 — E-MAIL\n\n${(state.email||'(geen tekst)').trim()}\n`;
+
+  document.getElementById('antwoord-blok').textContent=t;
+  document.getElementById('overzicht-screen').classList.add('show');
+  document.getElementById('scroll-area').scrollTop=0;
+}
+
+function kopieerAntwoorden(){
+  const t=document.getElementById('antwoord-blok').textContent;
+  navigator.clipboard.writeText(t).then(()=>{
+    const btn=document.getElementById('kopieer-btn');
+    btn.textContent='✓ Gekopieerd!';btn.classList.add('copied');
+    setTimeout(()=>{btn.textContent='📋 Kopieer antwoorden';btn.classList.remove('copied')},2500);
+  }).catch(()=>{
+    const el=document.getElementById('antwoord-blok');
+    const r=document.createRange();r.selectNodeContents(el);
+    const s=window.getSelection();s.removeAllRanges();s.addRange(r);
+  });
+}
+
+function restoreState(){
+  loadState();
+  if(state.naam)document.getElementById('naam-input').value=state.naam;
+  if(state.started){
+    lockNaam();
+    Object.entries(state.fill).forEach(([q,v])=>{const el=document.querySelector('[data-q="'+q+'"]');if(el)el.value=v});
+    syncWordbank();
+    Object.entries(state.mc).forEach(([q,v])=>{
+      const opts=document.querySelector('.mc-options[data-q="'+q+'"]');if(!opts)return;
+      opts.querySelectorAll('.mc-option').forEach(opt=>{if(opt.querySelector('span:last-child').textContent.trim()[0]===v)opt.classList.add('selected')});
+    });
+    if(state.email){document.getElementById('email-tekst').value=state.email;updateWordCount()}
+    if(state.checklists&&state.checklists.length){
+      document.querySelectorAll('.chk-box').forEach((el,i)=>{if(state.checklists[i]){el.classList.add('checked');el.textContent='✓'}});
+    }
+    if(state.submitted){inleveren()}
+    else{setTabsLocked(false);goTab('situatie')}
+  } else {
+    setTabsLocked(true);
+  }
+}
+
+restoreState();
+</script>
+</body>
+</html>
