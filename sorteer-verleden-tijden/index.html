@@ -1,0 +1,1084 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<meta name="theme-color" content="#1a1208">
+<title>Sorteertool — Verleden Tijden</title>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,300;0,700;1,300&family=Nunito:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #f5f0e8;
+    --ink: #1a1208;
+    --accent: #c8391a;
+    --gold: #d4a017;
+    --muted: #8a7a62;
+    --card: #fffdf7;
+    --border: #d4c9b0;
+    --green: #2e7d32;
+    --blue: #1565c0;
+    --header-h: 54px;
+
+    --col-p: #c8391a;   /* perfecto */
+    --col-i: #1565c0;   /* indefinido */
+    --col-im: #2e7d32;  /* imperfecto */
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+  html, body { height: 100%; }
+
+  body {
+    background: var(--bg);
+    color: var(--ink);
+    font-family: 'Nunito', sans-serif;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+  }
+
+  /* ── HEADER ── */
+  header {
+    background: var(--ink);
+    color: var(--bg);
+    padding: 0 14px;
+    height: var(--header-h);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-shrink: 0;
+    z-index: 100;
+  }
+  header h1 {
+    font-family: 'Fraunces', serif;
+    font-weight: 700;
+    font-size: 1.05rem;
+    letter-spacing: -0.02em;
+    flex-shrink: 0;
+  }
+  .header-room {
+    font-size: 0.65rem;
+    color: var(--gold);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    flex: 1;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .header-name {
+    font-size: 0.72rem;
+    color: #aaa;
+    flex-shrink: 0;
+    white-space: nowrap;
+  }
+
+  /* ── TOOLBAR (docent) ── */
+  .toolbar {
+    background: var(--card);
+    border-bottom: 1px solid var(--border);
+    padding: 8px 14px;
+    display: none;
+    align-items: center;
+    gap: 8px;
+    flex-shrink: 0;
+    flex-wrap: wrap;
+  }
+  .toolbar.visible { display: flex; }
+
+  .tb-btn {
+    font-family: 'Nunito', sans-serif;
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    padding: 5px 12px;
+    border-radius: 4px;
+    border: none;
+    cursor: pointer;
+    transition: opacity .15s;
+  }
+  .tb-btn:hover { opacity: .8; }
+  .tb-btn.reveal  { background: var(--accent); color: #fff; }
+  .tb-btn.reset   { background: var(--ink); color: var(--bg); }
+  .tb-btn.next    { background: var(--gold); color: var(--ink); }
+
+  .tb-label {
+    font-size: 0.7rem;
+    color: var(--muted);
+    margin-left: auto;
+  }
+
+  /* ── PROGRESS BAR (docent view) ── */
+  .progress-bar-wrap {
+    display: none;
+    background: var(--card);
+    border-bottom: 1px solid var(--border);
+    padding: 6px 14px;
+    gap: 12px;
+    align-items: center;
+    flex-shrink: 0;
+  }
+  .progress-bar-wrap.visible { display: flex; }
+  .progress-label { font-size: 0.68rem; color: var(--muted); white-space: nowrap; }
+  .progress-track {
+    flex: 1;
+    height: 6px;
+    background: var(--border);
+    border-radius: 3px;
+    overflow: hidden;
+  }
+  .progress-fill {
+    height: 100%;
+    background: var(--green);
+    border-radius: 3px;
+    transition: width .4s ease;
+    width: 0%;
+  }
+  .progress-count { font-size: 0.68rem; font-weight: 700; color: var(--ink); white-space: nowrap; }
+
+  /* ── MAIN ── */
+  main {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+
+  /* ── SENTENCE CARD (cursist) ── */
+  .sentence-area {
+    padding: 16px 14px 8px;
+    flex-shrink: 0;
+  }
+  .sentence-label {
+    font-size: 0.62rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 6px;
+  }
+  .sentence-card {
+    background: var(--card);
+    border: 1.5px solid var(--border);
+    border-radius: 10px;
+    padding: 16px 18px;
+    font-size: 1.05rem;
+    line-height: 1.5;
+    color: var(--ink);
+    min-height: 68px;
+    display: flex;
+    align-items: center;
+    font-style: italic;
+  }
+  .sentence-card.done {
+    opacity: .45;
+    font-size: 0.9rem;
+  }
+
+  /* ── COLUMNS ── */
+  .columns {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 10px;
+    padding: 10px 14px 16px;
+    flex: 1;
+    overflow: hidden;
+  }
+
+  .col {
+    display: flex;
+    flex-direction: column;
+    border-radius: 10px;
+    border: 2px solid transparent;
+    overflow: hidden;
+    background: var(--card);
+    transition: border-color .2s, box-shadow .2s;
+  }
+  .col.perfecto  { border-color: rgba(200,57,26,.35); }
+  .col.indefinido{ border-color: rgba(21,101,192,.35); }
+  .col.imperfecto{ border-color: rgba(46,125,50,.35); }
+
+  .col.drop-target { box-shadow: 0 0 0 3px currentColor; }
+
+  .col-header {
+    padding: 8px 10px 6px;
+    text-align: center;
+    font-family: 'Fraunces', serif;
+    font-size: 0.8rem;
+    font-weight: 700;
+    letter-spacing: -0.01em;
+    color: #fff;
+    flex-shrink: 0;
+  }
+  .col.perfecto  .col-header { background: var(--col-p); }
+  .col.indefinido .col-header { background: var(--col-i); }
+  .col.imperfecto .col-header { background: var(--col-im); }
+
+  .col-subline {
+    font-family: 'Nunito', sans-serif;
+    font-size: 0.58rem;
+    font-weight: 600;
+    opacity: .85;
+    margin-top: 1px;
+    letter-spacing: 0.03em;
+  }
+
+  .col-btn-area {
+    padding: 8px;
+    flex-shrink: 0;
+  }
+  .col-btn {
+    width: 100%;
+    padding: 9px 6px;
+    border: none;
+    border-radius: 6px;
+    font-family: 'Nunito', sans-serif;
+    font-size: 0.78rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: opacity .15s, transform .1s;
+    letter-spacing: 0.01em;
+  }
+  .col-btn:hover:not(:disabled) { opacity: .85; transform: translateY(-1px); }
+  .col-btn:active { transform: scale(.97); }
+  .col-btn:disabled { opacity: .35; cursor: default; transform: none; }
+  .col.perfecto  .col-btn { background: var(--col-p); color: #fff; }
+  .col.indefinido .col-btn { background: var(--col-i); color: #fff; }
+  .col.imperfecto .col-btn { background: var(--col-im); color: #fff; }
+
+  /* ── ANSWERS in column ── */
+  .col-answers {
+    flex: 1;
+    overflow-y: auto;
+    padding: 4px 8px 8px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    min-height: 40px;
+  }
+
+  .answer-chip {
+    font-size: 0.65rem;
+    padding: 3px 7px;
+    border-radius: 4px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    line-height: 1.3;
+    word-break: break-word;
+  }
+  .answer-chip .chip-name {
+    opacity: .7;
+    font-weight: 700;
+    flex-shrink: 0;
+  }
+  .answer-chip .chip-dot {
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+  /* neutral before reveal */
+  .answer-chip.pending { background: rgba(0,0,0,.06); color: var(--ink); }
+  /* after reveal */
+  .answer-chip.correct { background: rgba(46,125,50,.12); color: #1b5e20; }
+  .answer-chip.wrong   { background: rgba(200,57,26,.12); color: #7f1a08; }
+
+  /* feedback overlay on sentence card */
+  .sentence-card.correct-anim { border-color: var(--green); background: rgba(46,125,50,.07); }
+  .sentence-card.wrong-anim   { border-color: var(--accent); background: rgba(200,57,26,.07); }
+
+  /* ── REVEALED ANSWER banner (cursist) ── */
+  .revealed-banner {
+    display: none;
+    margin: 0 14px 6px;
+    padding: 8px 14px;
+    border-radius: 7px;
+    font-size: 0.78rem;
+    font-weight: 700;
+    text-align: center;
+    flex-shrink: 0;
+  }
+  .revealed-banner.show { display: block; }
+  .revealed-banner.correct { background: rgba(46,125,50,.14); color: #1b5e20; }
+  .revealed-banner.wrong   { background: rgba(200,57,26,.12); color: #7f1a08; }
+
+  /* ── DOCENT OVERVIEW ── */
+  .teacher-overview {
+    display: none;
+    flex: 1;
+    overflow-y: auto;
+    padding: 12px 14px 20px;
+  }
+  .teacher-overview.visible { display: block; }
+
+  .overview-title {
+    font-family: 'Fraunces', serif;
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: var(--muted);
+    margin-bottom: 10px;
+    letter-spacing: -0.01em;
+  }
+  .overview-item {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 10px 12px;
+    margin-bottom: 8px;
+  }
+  .overview-q {
+    font-style: italic;
+    font-size: 0.82rem;
+    color: var(--ink);
+    margin-bottom: 6px;
+    line-height: 1.4;
+  }
+  .overview-answers {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+  }
+  .ov-chip {
+    font-size: 0.62rem;
+    font-weight: 700;
+    padding: 2px 8px;
+    border-radius: 3px;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+  .ov-chip.correct { background: rgba(46,125,50,.15); color: #1b5e20; }
+  .ov-chip.wrong   { background: rgba(200,57,26,.12); color: #7f1a08; }
+  .ov-chip.pending { background: rgba(0,0,0,.07); color: var(--ink); }
+
+  /* ── TOAST ── */
+  #toast {
+    position: fixed;
+    bottom: 24px;
+    left: 50%;
+    transform: translateX(-50%) translateY(12px);
+    background: var(--ink);
+    color: var(--bg);
+    padding: 8px 18px;
+    border-radius: 20px;
+    font-size: 0.78rem;
+    font-weight: 600;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity .25s, transform .25s;
+    z-index: 999;
+    white-space: nowrap;
+  }
+  #toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+  /* ── ROUND COMPLETE (cursist) ── */
+  .round-done {
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    flex: 1;
+    padding: 24px;
+    text-align: center;
+    gap: 10px;
+  }
+  .round-done.show { display: flex; }
+  .round-done-icon { font-size: 2.5rem; }
+  .round-done h2 { font-family: 'Fraunces', serif; font-size: 1.3rem; }
+  .round-done p { font-size: 0.82rem; color: var(--muted); }
+
+  /* ── MODAL ── */
+  .modal-overlay {
+    position: fixed; inset: 0;
+    background: rgba(26,18,8,.7);
+    display: flex; align-items: center; justify-content: center;
+    z-index: 200;
+    padding: 20px;
+  }
+  .modal-overlay.hidden { display: none; }
+  .modal-box {
+    background: var(--card);
+    border-radius: 14px;
+    padding: 28px 24px 24px;
+    width: 100%;
+    max-width: 340px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+  .modal-title {
+    font-family: 'Fraunces', serif;
+    font-size: 1.25rem;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    color: var(--ink);
+  }
+  .modal-sub {
+    font-size: 0.78rem;
+    color: var(--muted);
+    line-height: 1.5;
+    margin-top: -8px;
+  }
+  .field-label {
+    font-size: 0.68rem;
+    font-weight: 700;
+    letter-spacing: 0.07em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 4px;
+    display: block;
+  }
+  .field-input {
+    width: 100%;
+    padding: 10px 12px;
+    border: 1.5px solid var(--border);
+    border-radius: 6px;
+    font-family: 'Nunito', sans-serif;
+    font-size: 0.9rem;
+    background: var(--bg);
+    color: var(--ink);
+    outline: none;
+    transition: border-color .15s;
+  }
+  .field-input:focus { border-color: var(--accent); }
+
+  .color-row {
+    display: flex; gap: 8px; flex-wrap: wrap;
+  }
+  .color-swatch {
+    width: 26px; height: 26px;
+    border-radius: 50%;
+    border: 2.5px solid transparent;
+    cursor: pointer;
+    transition: transform .15s;
+  }
+  .color-swatch.selected { border-color: var(--ink); transform: scale(1.15); }
+
+  .role-toggle {
+    display: flex; gap: 8px;
+  }
+  .role-btn {
+    flex: 1;
+    padding: 8px;
+    border-radius: 6px;
+    border: 1.5px solid var(--border);
+    background: transparent;
+    font-family: 'Nunito', sans-serif;
+    font-size: 0.78rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background .15s, border-color .15s;
+  }
+  .role-btn.active { background: var(--ink); color: var(--bg); border-color: var(--ink); }
+
+  .room-display {
+    text-align: center;
+    padding: 10px;
+    background: var(--bg);
+    border-radius: 8px;
+  }
+  .room-code {
+    font-family: 'Fraunces', serif;
+    font-size: 2rem;
+    font-weight: 700;
+    letter-spacing: 0.15em;
+    color: var(--gold);
+  }
+
+  .modal-submit {
+    background: var(--accent);
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    padding: 12px;
+    font-family: 'Nunito', sans-serif;
+    font-size: 0.9rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: opacity .15s;
+    letter-spacing: 0.03em;
+  }
+  .modal-submit:hover { opacity: .88; }
+
+  .modal-error {
+    font-size: 0.75rem;
+    color: var(--accent);
+    font-weight: 700;
+    display: none;
+  }
+  .modal-error.show { display: block; }
+
+  /* scrollbar */
+  ::-webkit-scrollbar { width: 4px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+</style>
+</head>
+<body>
+
+<!-- MODAL -->
+<div class="modal-overlay" id="modal">
+  <div class="modal-box">
+    <div class="modal-title">Verleden Tijden</div>
+    <p class="modal-sub">Sorteeroefening — Perfecto · Indefinido · Imperfecto</p>
+
+    <div>
+      <label class="field-label">Jouw naam</label>
+      <input class="field-input" type="text" id="input-name" placeholder="bijv. Anna" maxlength="20"
+        onkeydown="if(event.key==='Enter') tryJoin()">
+    </div>
+
+    <div id="student-room-field">
+      <label class="field-label">Kamercode (van de docent)</label>
+      <input class="field-input" type="text" id="input-room" placeholder="bijv. AB12"
+        maxlength="6" style="text-transform:uppercase;letter-spacing:.1em;"
+        onkeydown="if(event.key==='Enter') tryJoin()"
+        oninput="this.value=this.value.toUpperCase()">
+    </div>
+
+    <div>
+      <label class="field-label">Kies een kleur</label>
+      <div class="color-row" id="color-row"></div>
+    </div>
+
+    <div class="role-toggle">
+      <button class="role-btn active" id="role-student" onclick="setRole('student')">🎓 Cursist</button>
+      <button class="role-btn"        id="role-teacher" onclick="setRole('teacher')">📋 Docent</button>
+    </div>
+
+    <div id="teacher-setup" style="display:none;">
+      <div class="room-display">
+        <div class="room-code" id="display-room-code">—</div>
+        <small style="font-size:.68rem;color:var(--muted);">Deel deze code met je cursisten</small>
+      </div>
+    </div>
+
+    <div class="modal-error" id="modal-error">Vul je naam in.</div>
+    <button class="modal-submit" onclick="tryJoin()">Deelnemen →</button>
+  </div>
+</div>
+
+<!-- HEADER -->
+<header>
+  <h1>Verleden Tijden</h1>
+  <span class="header-room" id="header-room"></span>
+  <span class="header-name" id="header-name"></span>
+</header>
+
+<!-- TOOLBAR (docent only) -->
+<div class="toolbar" id="toolbar">
+  <button class="tb-btn reveal"  onclick="teacherReveal()">✓ Onthul antwoorden</button>
+  <button class="tb-btn next"    onclick="teacherNext()">→ Volgende zin</button>
+  <button class="tb-btn reset"   onclick="teacherReset()">↺ Reset alles</button>
+  <span class="tb-label" id="tb-round-label"></span>
+</div>
+
+<!-- PROGRESS BAR (docent) -->
+<div class="progress-bar-wrap" id="progress-bar-wrap">
+  <span class="progress-label" id="progress-label">0 / 0 klaar</span>
+  <div class="progress-track"><div class="progress-fill" id="progress-fill"></div></div>
+  <span class="progress-count" id="progress-count"></span>
+</div>
+
+<!-- MAIN — cursist view -->
+<main id="student-view">
+  <div class="sentence-area">
+    <div class="sentence-label">Zin <span id="round-num">1</span> van <span id="round-total">10</span></div>
+    <div class="sentence-card" id="sentence-card">Wachten op docent…</div>
+  </div>
+
+  <div class="revealed-banner" id="revealed-banner"></div>
+
+  <div class="columns">
+    <div class="col perfecto">
+      <div class="col-header">Perfecto<div class="col-subline">He comido</div></div>
+      <div class="col-btn-area">
+        <button class="col-btn" onclick="submitAnswer('perfecto')" id="btn-perfecto">
+          ¿Perfecto?
+        </button>
+      </div>
+      <div class="col-answers" id="answers-perfecto"></div>
+    </div>
+
+    <div class="col indefinido">
+      <div class="col-header">Indefinido<div class="col-subline">Comí</div></div>
+      <div class="col-btn-area">
+        <button class="col-btn" onclick="submitAnswer('indefinido')" id="btn-indefinido">
+          ¿Indefinido?
+        </button>
+      </div>
+      <div class="col-answers" id="answers-indefinido"></div>
+    </div>
+
+    <div class="col imperfecto">
+      <div class="col-header">Imperfecto<div class="col-subline">Comía</div></div>
+      <div class="col-btn-area">
+        <button class="col-btn" onclick="submitAnswer('imperfecto')" id="btn-imperfecto">
+          ¿Imperfecto?
+        </button>
+      </div>
+      <div class="col-answers" id="answers-imperfecto"></div>
+    </div>
+  </div>
+
+  <div class="round-done" id="round-done">
+    <div class="round-done-icon">✅</div>
+    <h2>Klaar!</h2>
+    <p>Je hebt alle zinnen gesorteerd.<br>Wacht op de docent voor de volgende stap.</p>
+  </div>
+</main>
+
+<!-- DOCENT VIEW -->
+<div class="teacher-overview" id="teacher-view">
+  <div class="overview-title">Overzicht antwoorden cursisten</div>
+  <div id="overview-list"></div>
+</div>
+
+<div id="toast"></div>
+
+<script type="module">
+import { initializeApp }
+  from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js';
+import { getDatabase, ref, set, onValue, remove, update, push, get }
+  from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js';
+
+// ── FIREBASE CONFIG ──────────────────────────────────────────────
+// Vervang dit met jouw eigen Firebase config (zie installatie-instructies onderaan)
+const FIREBASE_CONFIG = {
+  apiKey: "JOUW_API_KEY",
+  authDomain: "JOUW_PROJECT.firebaseapp.com",
+  databaseURL: "https://JOUW_PROJECT-default-rtdb.europe-west1.firebasedatabase.app",
+  projectId: "JOUW_PROJECT",
+  storageBucket: "JOUW_PROJECT.appspot.com",
+  messagingSenderId: "JOUW_SENDER_ID",
+  appId: "JOUW_APP_ID"
+};
+// ────────────────────────────────────────────────────────────────
+
+// ── ZINNEN — pas hier de inhoud aan ─────────────────────────────
+// correct: 'perfecto' | 'indefinido' | 'imperfecto'
+const SENTENCES = [
+  {
+    id: 's1',
+    text: "Esta semana he trabajado mucho.",
+    correct: 'perfecto',
+    hint: "esta semana → verbinding met nu"
+  },
+  {
+    id: 's2',
+    text: "Ayer fui al supermercado.",
+    correct: 'indefinido',
+    hint: "ayer → afgesloten moment"
+  },
+  {
+    id: 's3',
+    text: "Cuando era niño, vivía en Sevilla.",
+    correct: 'imperfecto',
+    hint: "cuando era niño → langdurige toestand"
+  },
+  {
+    id: 's4',
+    text: "¿Has visto esta película?",
+    correct: 'perfecto',
+    hint: "¿Has visto? → relevantie voor nu"
+  },
+  {
+    id: 's5',
+    text: "El año pasado viajamos a México.",
+    correct: 'indefinido',
+    hint: "el año pasado → afgerond feit"
+  },
+  {
+    id: 's6',
+    text: "Siempre comíamos juntos los domingos.",
+    correct: 'imperfecto',
+    hint: "siempre + vroeger → gewoonte"
+  },
+  {
+    id: 's7',
+    text: "Nunca he probado el pulpo.",
+    correct: 'perfecto',
+    hint: "nunca he + ervaring tot nu toe"
+  },
+  {
+    id: 's8',
+    text: "Llegamos tarde porque había mucho tráfico.",
+    correct: 'imperfecto',
+    hint: "había → achtergrondtoestand"
+  },
+  {
+    id: 's9',
+    text: "En 2019 empecé a estudiar español.",
+    correct: 'indefinido',
+    hint: "puntdatum in het verleden"
+  },
+  {
+    id: 's10',
+    text: "Esta mañana he tomado un café.",
+    correct: 'perfecto',
+    hint: "esta mañana → vandaag nog"
+  }
+];
+// ────────────────────────────────────────────────────────────────
+
+const PIN_COLORS = [
+  '#c8391a','#1565c0','#2e7d32','#d4a017',
+  '#6a1b9a','#00838f','#ad1457','#e65100',
+  '#37474f','#558b2f'
+];
+
+const app = initializeApp(FIREBASE_CONFIG);
+const db  = getDatabase(app);
+
+let myName    = '';
+let myColor   = PIN_COLORS[0];
+let myRole    = 'student';
+let roomCode  = '';
+let myId      = 'u_' + Math.random().toString(36).slice(2, 9);
+let hasAnswered = false;
+let selectedColor = 0;
+let revealed = false;
+let currentRound = 0;
+
+// ── COLOR PICKER ──────────────────────────────────────────────
+const colorRow = document.getElementById('color-row');
+PIN_COLORS.forEach((c, i) => {
+  const sw = document.createElement('button');
+  sw.className = 'color-swatch' + (i === 0 ? ' selected' : '');
+  sw.style.background = c;
+  sw.onclick = () => {
+    selectedColor = i;
+    myColor = PIN_COLORS[i];
+    document.querySelectorAll('.color-swatch').forEach((s, j) =>
+      s.classList.toggle('selected', j === i));
+  };
+  colorRow.appendChild(sw);
+});
+
+window.setRole = function(role) {
+  myRole = role;
+  document.getElementById('role-student').classList.toggle('active', role === 'student');
+  document.getElementById('role-teacher').classList.toggle('active', role === 'teacher');
+  document.getElementById('student-room-field').style.display = role === 'student' ? 'block' : 'none';
+  document.getElementById('teacher-setup').style.display = role === 'teacher' ? 'block' : 'none';
+  if (role === 'teacher') {
+    const code = Math.random().toString(36).slice(2, 6).toUpperCase();
+    document.getElementById('input-room').value = code;
+    document.getElementById('display-room-code').textContent = code;
+  }
+};
+
+window.tryJoin = function() {
+  const name = document.getElementById('input-name').value.trim();
+  const err  = document.getElementById('modal-error');
+  if (!name) { err.classList.add('show'); err.textContent = 'Vul je naam in.'; return; }
+  err.classList.remove('show');
+
+  myName    = name;
+  roomCode  = document.getElementById('input-room').value.trim().toUpperCase();
+  if (!roomCode) { err.classList.add('show'); err.textContent = 'Vul de kamercode in.'; return; }
+
+  document.getElementById('header-name').textContent = myName;
+  document.getElementById('header-room').textContent = 'Kamer ' + roomCode;
+  document.getElementById('modal').classList.add('hidden');
+
+  if (myRole === 'teacher') {
+    initTeacher();
+  } else {
+    initStudent();
+  }
+};
+
+// ── TEACHER ───────────────────────────────────────────────────
+function initTeacher() {
+  document.getElementById('toolbar').classList.add('visible');
+  document.getElementById('progress-bar-wrap').classList.add('visible');
+  document.getElementById('student-view').style.display = 'none';
+  document.getElementById('teacher-view').classList.add('visible');
+
+  // init room state if not exists
+  const roomRef = ref(db, `rooms/${roomCode}/state`);
+  get(roomRef).then(snap => {
+    if (!snap.exists()) {
+      set(roomRef, { round: 0, revealed: false, total: SENTENCES.length });
+    }
+  });
+
+  listenTeacher();
+}
+
+function listenTeacher() {
+  onValue(ref(db, `rooms/${roomCode}/state`), snap => {
+    if (!snap.exists()) return;
+    const state = snap.val();
+    currentRound = state.round || 0;
+    revealed = state.revealed || false;
+    document.getElementById('tb-round-label').textContent =
+      `Zin ${Math.min(currentRound + 1, SENTENCES.length)} van ${SENTENCES.length}`;
+    renderTeacherOverview(state);
+  });
+
+  onValue(ref(db, `rooms/${roomCode}/answers`), snap => {
+    renderProgressBar(snap.val() || {});
+    renderTeacherOverview(null, snap.val() || {});
+  });
+}
+
+function renderTeacherOverview(state, answersData) {
+  const list = document.getElementById('overview-list');
+  if (!answersData) {
+    // triggered from state listener — re-read answers
+    get(ref(db, `rooms/${roomCode}/answers`)).then(snap => {
+      renderTeacherOverview(state, snap.val() || {});
+    });
+    return;
+  }
+
+  const stateRound = currentRound;
+  const rev = revealed;
+  list.innerHTML = '';
+
+  SENTENCES.forEach((s, idx) => {
+    const item = document.createElement('div');
+    item.className = 'overview-item';
+    item.style.opacity = idx > stateRound ? '.4' : '1';
+
+    const q = document.createElement('div');
+    q.className = 'overview-q';
+    q.textContent = `${idx + 1}. ${s.text}`;
+    if (rev) {
+      q.innerHTML += ` <span style="font-size:.65rem;font-weight:700;color:var(--muted);">[${s.correct}]</span>`;
+    }
+    item.appendChild(q);
+
+    const chips = document.createElement('div');
+    chips.className = 'overview-answers';
+
+    const roundAnswers = answersData[s.id] || {};
+    if (Object.keys(roundAnswers).length === 0) {
+      const empty = document.createElement('span');
+      empty.style.fontSize = '.62rem';
+      empty.style.color = 'var(--muted)';
+      empty.textContent = 'Nog geen antwoorden';
+      chips.appendChild(empty);
+    } else {
+      Object.values(roundAnswers).forEach(a => {
+        const chip = document.createElement('div');
+        chip.className = 'ov-chip ' + (rev ? (a.answer === s.correct ? 'correct' : 'wrong') : 'pending');
+        chip.innerHTML = `<span style="width:7px;height:7px;border-radius:50%;background:${a.color};flex-shrink:0;display:inline-block;"></span>
+          ${a.name}: ${a.answer}`;
+        chips.appendChild(chip);
+      });
+    }
+
+    item.appendChild(chips);
+    list.appendChild(item);
+  });
+}
+
+function renderProgressBar(answersData) {
+  const stateRound = currentRound;
+  const s = SENTENCES[stateRound];
+  if (!s) return;
+  const roundAnswers = Object.values(answersData[s.id] || {});
+  const total = roundAnswers.length;
+  const pct = total === 0 ? 0 : 100;
+  document.getElementById('progress-label').textContent = `${total} antwoord${total !== 1 ? 'en' : ''}`;
+  document.getElementById('progress-fill').style.width = Math.min(total * 10, 100) + '%';
+  document.getElementById('progress-count').textContent = `zin ${stateRound + 1}/${SENTENCES.length}`;
+}
+
+window.teacherReveal = function() {
+  update(ref(db, `rooms/${roomCode}/state`), { revealed: true });
+  showToast('Antwoorden onthuld!');
+};
+
+window.teacherNext = function() {
+  get(ref(db, `rooms/${roomCode}/state`)).then(snap => {
+    const cur = snap.val()?.round || 0;
+    if (cur + 1 >= SENTENCES.length) {
+      showToast('Dat was de laatste zin!');
+      return;
+    }
+    update(ref(db, `rooms/${roomCode}/state`), { round: cur + 1, revealed: false });
+    showToast('Volgende zin →');
+  });
+};
+
+window.teacherReset = function() {
+  if (!confirm('Alles resetten? Alle antwoorden worden gewist.')) return;
+  set(ref(db, `rooms/${roomCode}/answers`), null);
+  set(ref(db, `rooms/${roomCode}/state`), { round: 0, revealed: false, total: SENTENCES.length });
+  showToast('Reset gedaan');
+};
+
+// ── STUDENT ───────────────────────────────────────────────────
+function initStudent() {
+  onValue(ref(db, `rooms/${roomCode}/state`), snap => {
+    if (!snap.exists()) return;
+    const state = snap.val();
+    const round = state.round || 0;
+
+    if (round !== currentRound) {
+      currentRound = round;
+      hasAnswered = false;
+      revealed = false;
+      resetStudentUI();
+    } else {
+      currentRound = round;
+    }
+
+    revealed = state.revealed || false;
+
+    if (round >= SENTENCES.length) {
+      showRoundDone();
+      return;
+    }
+
+    const s = SENTENCES[round];
+    document.getElementById('round-num').textContent = round + 1;
+    document.getElementById('round-total').textContent = SENTENCES.length;
+    document.getElementById('sentence-card').textContent = s.text;
+    document.getElementById('sentence-card').className = 'sentence-card';
+
+    if (revealed) showReveal(round);
+  });
+
+  onValue(ref(db, `rooms/${roomCode}/answers`), snap => {
+    renderStudentAnswers(snap.val() || {});
+  });
+}
+
+function resetStudentUI() {
+  document.getElementById('sentence-card').className = 'sentence-card';
+  document.getElementById('revealed-banner').className = 'revealed-banner';
+  ['perfecto','indefinido','imperfecto'].forEach(t => {
+    document.getElementById(`answers-${t}`).innerHTML = '';
+    document.getElementById(`btn-${t}`).disabled = false;
+  });
+  document.getElementById('round-done').classList.remove('show');
+}
+
+function showRoundDone() {
+  document.getElementById('round-done').classList.add('show');
+  document.querySelector('.sentence-area').style.display = 'none';
+  document.querySelector('.columns').style.display = 'none';
+  document.getElementById('revealed-banner').className = 'revealed-banner';
+}
+
+function showReveal(round) {
+  const s = SENTENCES[round];
+  const banner = document.getElementById('revealed-banner');
+
+  // find my answer
+  get(ref(db, `rooms/${roomCode}/answers/${s.id}/${myId}`)).then(snap => {
+    if (!snap.exists()) return;
+    const myAnswer = snap.val().answer;
+    const correct  = myAnswer === s.correct;
+    banner.textContent = correct
+      ? `✓ Juist! Het is de ${s.correct}. ${s.hint ? '— ' + s.hint : ''}`
+      : `✗ Niet juist — het is de ${s.correct}. ${s.hint ? s.hint : ''}`;
+    banner.className = 'revealed-banner show ' + (correct ? 'correct' : 'wrong');
+
+    const card = document.getElementById('sentence-card');
+    card.classList.add(correct ? 'correct-anim' : 'wrong-anim');
+  });
+}
+
+function renderStudentAnswers(answersData) {
+  ['perfecto','indefinido','imperfecto'].forEach(t => {
+    const container = document.getElementById(`answers-${t}`);
+    container.innerHTML = '';
+  });
+
+  const s = SENTENCES[currentRound];
+  if (!s) return;
+  const roundAnswers = answersData[s.id] || {};
+
+  Object.entries(roundAnswers).forEach(([uid, a]) => {
+    const col = document.getElementById(`answers-${a.answer}`);
+    if (!col) return;
+    const chip = document.createElement('div');
+    const isRevealed = revealed;
+    const isCorrect  = a.answer === s.correct;
+    chip.className = 'answer-chip ' + (isRevealed ? (isCorrect ? 'correct' : 'wrong') : 'pending');
+    chip.innerHTML = `<span class="chip-dot" style="background:${a.color}"></span>
+      <span class="chip-name">${a.name}</span>`;
+    col.appendChild(chip);
+  });
+}
+
+window.submitAnswer = function(tense) {
+  if (hasAnswered) { showToast('Je hebt al geantwoord!'); return; }
+  const s = SENTENCES[currentRound];
+  if (!s) return;
+
+  hasAnswered = true;
+  ['perfecto','indefinido','imperfecto'].forEach(t =>
+    document.getElementById(`btn-${t}`).disabled = true);
+
+  set(ref(db, `rooms/${roomCode}/answers/${s.id}/${myId}`), {
+    name:   myName,
+    color:  myColor,
+    answer: tense
+  });
+
+  showToast('Antwoord verstuurd!');
+};
+
+// ── TOAST ─────────────────────────────────────────────────────
+window.showToast = function(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2200);
+};
+</script>
+
+<!--
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  INSTALLATIE — eenmalig, ~5 minuten
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+STAP 1 — Firebase project aanmaken
+  1. Ga naar https://console.firebase.google.com
+  2. Klik "Add project" → naam: bijv. verleden-tijden
+  3. Google Analytics: niet nodig → zet uit
+  4. Klik "Create project"
+
+STAP 2 — Realtime Database activeren
+  1. Links in het menu: Build → Realtime Database
+  2. Klik "Create Database"
+  3. Regio: europe-west1 (België)
+  4. Start in "test mode"
+  5. Klik "Enable"
+
+STAP 3 — App registreren & config kopiëren
+  1. Ga naar Project Overview (tandwiel links boven)
+  2. Klik het </> (web) icoontje
+  3. Geef de app een naam → klik "Register app"
+  4. Kopieer het firebaseConfig object
+  5. Plak het in dit bestand bij FIREBASE_CONFIG bovenaan de <script>
+
+STAP 4 — Pushen naar GitHub
+  Zet dit bestand in je spaans-repo, bijv.:
+    spaans/verleden-tijden/sorteertool.html
+  Push → GitHub Pages publiceert het automatisch.
+
+GEBRUIK IN DE LES
+  • Docent opent de tool → kiest "Docent" → krijgt kamercode
+  • Deel de kamercode met cursisten (mondeling of in de chat)
+  • Cursisten openen dezelfde URL → "Cursist" → code invoeren
+  • Docent klikt "→ Volgende zin" om de volgende zin te activeren
+  • Cursisten klikken op de tijdknop van hun keuze
+  • Docent klikt "✓ Onthul antwoorden" → kleurcodering zichtbaar
+  • Herhaal voor alle 10 zinnen
+
+ZINNEN AANPASSEN
+  Pas de SENTENCES-array aan bovenaan de <script>:
+    { id: 's1', text: "...", correct: 'perfecto'|'indefinido'|'imperfecto', hint: "..." }
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+-->
+</body>
+</html>
