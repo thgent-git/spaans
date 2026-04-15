@@ -272,6 +272,18 @@
     font-weight: 700;
     flex-shrink: 0;
   }
+  .answer-chip .chip-zin {
+    font-size: 0.62rem;
+    line-height: 1.4;
+    flex: 1;
+  }
+  .answer-chip .chip-correct-label {
+    display: inline-block;
+    margin-left: 4px;
+    font-weight: 800;
+    font-size: 0.6rem;
+    opacity: .85;
+  }
   .answer-chip .chip-dot {
     width: 6px; height: 6px;
     border-radius: 50%;
@@ -644,7 +656,7 @@ import { getDatabase, ref, set, onValue, remove, update, push, get }
 
 // ── FIREBASE CONFIG ──────────────────────────────────────────────
 // Vervang dit met jouw eigen Firebase config (zie installatie-instructies onderaan)
-const firebaseConfig = {
+const FIREBASE_CONFIG = {
   apiKey: "AIzaSyBRzty3J3GKAz7rPpcsHYTZj0cD5rLxups",
   authDomain: "verleden-tijden-sorteren.firebaseapp.com",
   databaseURL: "https://verleden-tijden-sorteren-default-rtdb.europe-west1.firebasedatabase.app",
@@ -727,7 +739,7 @@ const PIN_COLORS = [
   '#37474f','#558b2f'
 ];
 
-const app = initializeApp(firebaseConfig);
+const app = initializeApp(FIREBASE_CONFIG);
 const db  = getDatabase(app);
 
 let myName    = '';
@@ -889,21 +901,19 @@ function renderProgressBar(answersData) {
 }
 
 window.teacherReveal = function() {
-  set(ref(db, `rooms/${roomCode}/state`), { round: currentRound, revealed: true, total: SENTENCES.length });
+  update(ref(db, `rooms/${roomCode}/state`), { revealed: true });
   showToast('Antwoorden onthuld!');
 };
 
 window.teacherNext = function() {
   get(ref(db, `rooms/${roomCode}/state`)).then(snap => {
-    const cur = snap.exists() ? (snap.val()?.round ?? 0) : 0;
+    const cur = snap.val()?.round || 0;
     if (cur + 1 >= SENTENCES.length) {
       showToast('Dat was de laatste zin!');
       return;
     }
     update(ref(db, `rooms/${roomCode}/state`), { round: cur + 1, revealed: false });
     showToast('Volgende zin →');
-  }).catch(err => {
-    showToast('Fout: ' + err.message);
   });
 };
 
@@ -993,19 +1003,34 @@ function renderStudentAnswers(answersData) {
     container.innerHTML = '';
   });
 
-  const s = SENTENCES[currentRound];
-  if (!s) return;
-  const roundAnswers = answersData[s.id] || {};
+  // Toon alle zinnen die deze cursist al beantwoord heeft
+  SENTENCES.forEach((s, idx) => {
+    const myAnswer = answersData[s.id]?.[myId];
+    if (!myAnswer) return;
 
-  Object.entries(roundAnswers).forEach(([uid, a]) => {
-    const col = document.getElementById(`answers-${a.answer}`);
+    const col = document.getElementById(`answers-${myAnswer.answer}`);
     if (!col) return;
+
+    const isCorrect = myAnswer.answer === s.correct;
     const chip = document.createElement('div');
-    const isRevealed = revealed;
-    const isCorrect  = a.answer === s.correct;
-    chip.className = 'answer-chip ' + (isRevealed ? (isCorrect ? 'correct' : 'wrong') : 'pending');
-    chip.innerHTML = `<span class="chip-dot" style="background:${a.color}"></span>
-      <span class="chip-name">${a.name}</span>`;
+
+    if (revealed) {
+      chip.className = 'answer-chip ' + (isCorrect ? 'correct' : 'wrong');
+      if (isCorrect) {
+        chip.innerHTML = `<span class="chip-dot" style="background:${myAnswer.color}"></span>
+          <span class="chip-zin">${idx + 1}. ${s.text}</span>`;
+      } else {
+        chip.innerHTML = `<span class="chip-dot" style="background:${myAnswer.color}"></span>
+          <span class="chip-zin">${idx + 1}. ${s.text}
+            <span class="chip-correct-label">→ ${s.correct}</span>
+          </span>`;
+      }
+    } else {
+      chip.className = 'answer-chip pending';
+      chip.innerHTML = `<span class="chip-dot" style="background:${myAnswer.color}"></span>
+        <span class="chip-zin">${idx + 1}. ${s.text}</span>`;
+    }
+
     col.appendChild(chip);
   });
 }
