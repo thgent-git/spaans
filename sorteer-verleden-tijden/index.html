@@ -644,14 +644,14 @@ import { getDatabase, ref, set, onValue, remove, update, push, get }
 
 // ── FIREBASE CONFIG ──────────────────────────────────────────────
 // Vervang dit met jouw eigen Firebase config (zie installatie-instructies onderaan)
-const FIREBASE_CONFIG = {
-  apiKey: "JOUW_API_KEY",
-  authDomain: "JOUW_PROJECT.firebaseapp.com",
-  databaseURL: "https://JOUW_PROJECT-default-rtdb.europe-west1.firebasedatabase.app",
-  projectId: "JOUW_PROJECT",
-  storageBucket: "JOUW_PROJECT.appspot.com",
-  messagingSenderId: "JOUW_SENDER_ID",
-  appId: "JOUW_APP_ID"
+const firebaseConfig = {
+  apiKey: "AIzaSyBRzty3J3GKAz7rPpcsHYTZj0cD5rLxups",
+  authDomain: "verleden-tijden-sorteren.firebaseapp.com",
+  databaseURL: "https://verleden-tijden-sorteren-default-rtdb.europe-west1.firebasedatabase.app",
+  projectId: "verleden-tijden-sorteren",
+  storageBucket: "verleden-tijden-sorteren.firebasestorage.app",
+  messagingSenderId: "703296554726",
+  appId: "1:703296554726:web:2243d2c5adeae75a8f5d27"
 };
 // ────────────────────────────────────────────────────────────────
 
@@ -660,63 +660,63 @@ const FIREBASE_CONFIG = {
 const SENTENCES = [
   {
     id: 's1',
-    text: "Esta semana he trabajado mucho.",
+    text: "Deze week heb ik veel gewerkt.",
     correct: 'perfecto',
-    hint: "esta semana → verbinding met nu"
+    hint: "deze week → nog niet voorbij, verbinding met nu"
   },
   {
     id: 's2',
-    text: "Ayer fui al supermercado.",
+    text: "Gisteren ging ik naar de supermarkt.",
     correct: 'indefinido',
-    hint: "ayer → afgesloten moment"
+    hint: "gisteren → afgesloten, punt"
   },
   {
     id: 's3',
-    text: "Cuando era niño, vivía en Sevilla.",
+    text: "Toen ik klein was, woonde ik in Sevilla.",
     correct: 'imperfecto',
-    hint: "cuando era niño → langdurige toestand"
+    hint: "langdurige toestand in het verleden"
   },
   {
     id: 's4',
-    text: "¿Has visto esta película?",
+    text: "Heb jij die film al gezien?",
     correct: 'perfecto',
-    hint: "¿Has visto? → relevantie voor nu"
+    hint: "ervaring die nu nog relevant is"
   },
   {
     id: 's5',
-    text: "El año pasado viajamos a México.",
+    text: "Vorig jaar zijn we naar Mexico gereisd.",
     correct: 'indefinido',
-    hint: "el año pasado → afgerond feit"
+    hint: "vorig jaar → afgerond feit, klaar"
   },
   {
     id: 's6',
-    text: "Siempre comíamos juntos los domingos.",
+    text: "Op zondag aten we altijd samen.",
     correct: 'imperfecto',
-    hint: "siempre + vroeger → gewoonte"
+    hint: "vroegere gewoonte, herhaald patroon"
   },
   {
     id: 's7',
-    text: "Nunca he probado el pulpo.",
+    text: "Ik heb nog nooit inktvis gegeten.",
     correct: 'perfecto',
-    hint: "nunca he + ervaring tot nu toe"
+    hint: "ervaring tot nu toe — het venster is nog open"
   },
   {
     id: 's8',
-    text: "Llegamos tarde porque había mucho tráfico.",
+    text: "We kwamen te laat omdat er veel file stond.",
     correct: 'imperfecto',
-    hint: "había → achtergrondtoestand"
+    hint: "de file was de achtergrond, de toestand"
   },
   {
     id: 's9',
-    text: "En 2019 empecé a estudiar español.",
+    text: "In 2019 ben ik begonnen met Spaans leren.",
     correct: 'indefinido',
-    hint: "puntdatum in het verleden"
+    hint: "puntdatum → eenmalige actie op een afgesloten moment"
   },
   {
     id: 's10',
-    text: "Esta mañana he tomado un café.",
+    text: "Vanmorgen heb ik een koffie gedronken.",
     correct: 'perfecto',
-    hint: "esta mañana → vandaag nog"
+    hint: "vanmorgen → vandaag nog, dag is nog niet voorbij"
   }
 ];
 // ────────────────────────────────────────────────────────────────
