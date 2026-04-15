@@ -889,19 +889,21 @@ function renderProgressBar(answersData) {
 }
 
 window.teacherReveal = function() {
-  update(ref(db, `rooms/${roomCode}/state`), { revealed: true });
+  set(ref(db, `rooms/${roomCode}/state`), { round: currentRound, revealed: true, total: SENTENCES.length });
   showToast('Antwoorden onthuld!');
 };
 
 window.teacherNext = function() {
   get(ref(db, `rooms/${roomCode}/state`)).then(snap => {
-    const cur = snap.val()?.round || 0;
+    const cur = snap.exists() ? (snap.val()?.round ?? 0) : 0;
     if (cur + 1 >= SENTENCES.length) {
       showToast('Dat was de laatste zin!');
       return;
     }
     update(ref(db, `rooms/${roomCode}/state`), { round: cur + 1, revealed: false });
     showToast('Volgende zin →');
+  }).catch(err => {
+    showToast('Fout: ' + err.message);
   });
 };
 
